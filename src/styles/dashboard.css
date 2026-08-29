@@ -38,21 +38,6 @@
     rgba(148, 163, 190, 0.1) calc(20% - 1px) 20%
   );
 }
-.f-radar-cross {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background:
-    linear-gradient(rgba(148, 163, 190, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 190, 0.1) 1px, transparent 1px);
-  background-size:
-    100% 50%,
-    50% 100%;
-  background-position:
-    50% 50%,
-    50% 50%;
-  background-repeat: no-repeat;
-}
 .f-radar-sweep {
   position: absolute;
   inset: 0;
@@ -78,6 +63,39 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ---------- 星座点缀 ---------- */
+.f-radar-stars {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.f-star {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--muted);
+  color: var(--muted);
+  box-shadow: 0 0 6px currentColor;
+  opacity: 0.1;
+  animation: f-twinkle var(--dur, 3s) ease-in-out var(--d, 0s) infinite;
+}
+.f-star--amber {
+  background: var(--amber);
+  color: var(--amber);
+  box-shadow: 0 0 8px rgba(255, 176, 58, 0.8);
+}
+@keyframes f-twinkle {
+  0%,
+  100% {
+    opacity: 0.08;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1);
   }
 }
 
@@ -542,7 +560,8 @@
 @media (prefers-reduced-motion: reduce) {
   .f-radar-sweep,
   .f-ticker-track,
-  .f-title-accent::after {
+  .f-title-accent::after,
+  .f-star {
     animation: none !important;
   }
   .f-reveal {
