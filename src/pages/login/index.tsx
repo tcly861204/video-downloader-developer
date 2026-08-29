@@ -84,7 +84,7 @@ const Login = () => {
           <aside className='lg-side' aria-hidden>
             <div className='lg-radar'>
               <span className='lg-radar-rings' />
-              <span className='lg-radar-cross' />
+              {/* <span className='lg-radar-cross' /> */}
               <span className='lg-radar-sweep' />
             </div>
             <ul className='lg-status'>
@@ -174,7 +174,7 @@ const Login = () => {
       </main>
 
       {/* ===== 页脚 ===== */}
-      <footer className='lg-foot py-2'>
+      <footer className='lg-foot py-4'>
         <span>SIGNAL FEED · V0.1.0</span>
         <span className='lg-foot-sep' aria-hidden />
         <span>© 2026 FRAMECATCH</span>

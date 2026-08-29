@@ -97,6 +97,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  height: 100%;
 }
 .s-status {
   display: flex;
@@ -114,48 +115,76 @@
 
 .s-nav {
   display: flex;
-  align-items: center;
-  gap: 4px;
+  align-items: stretch;
+  height: 100%;
 }
 .s-nav-item {
   position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 13px;
-  border: 1px solid transparent;
-  border-radius: 8px;
+  padding: 10px 16px 0;
   color: var(--muted);
-  font-size: 13.5px;
-  letter-spacing: 0.04em;
+  font-size: 13px;
+  letter-spacing: 0.08em;
   text-decoration: none;
   transition:
     color 0.18s,
-    background 0.18s;
+    letter-spacing 0.18s;
+}
+.s-nav-index {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  transition: color 0.18s;
+}
+.s-nav-item svg {
+  opacity: 0.75;
+  transition: opacity 0.18s;
+}
+.s-nav-item::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+  height: 2px;
+  background: transparent;
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
 }
 .s-nav-item:hover {
   color: var(--text);
-  background: rgba(148, 163, 190, 0.06);
+}
+.s-nav-item:hover .s-nav-index {
+  color: var(--amber);
+}
+.s-nav-item:hover svg {
+  opacity: 1;
+}
+.s-nav-item:hover::after {
+  background: rgba(255, 176, 58, 0.35);
 }
 .s-nav-active,
 .s-nav-active:hover {
   color: var(--amber);
-  background: rgba(255, 176, 58, 0.07);
+  letter-spacing: 0.14em;
+}
+.s-nav-active .s-nav-index {
+  color: var(--amber);
+}
+.s-nav-active svg {
+  opacity: 1;
 }
 .s-nav-active::after {
-  content: '';
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: -1px;
-  height: 2px;
-  border-radius: 2px;
   background: var(--amber);
-  box-shadow: 0 0 8px rgba(255, 176, 58, 0.6);
+  box-shadow: 0 0 10px rgba(255, 176, 58, 0.7);
 }
 .s-nav-item:focus-visible {
   outline: 2px solid var(--amber);
-  outline-offset: 1px;
+  outline-offset: -2px;
 }
 
 /* ---------- 内容区 ---------- */
@@ -177,16 +206,27 @@
     display: none;
   }
   .s-nav-item {
-    padding: 8px 10px;
+    padding: 0 12px;
     font-size: 12.5px;
+  }
+  .s-nav-item::after {
+    left: 12px;
+    right: 12px;
   }
 }
 @media (max-width: 520px) {
   .s-brand-text {
     display: none;
   }
+  .s-nav-index {
+    display: none;
+  }
   .s-nav-item {
-    padding: 8px 9px;
+    padding: 0 9px;
     gap: 6px;
+  }
+  .s-nav-item::after {
+    left: 9px;
+    right: 9px;
   }
 }

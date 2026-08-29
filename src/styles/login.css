@@ -51,7 +51,11 @@
   gap: 16px;
   flex: none;
 }
-.lg-brand { display: flex; align-items: center; gap: 12px; }
+.lg-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 .lg-logo {
   display: grid;
   place-items: center;
@@ -63,8 +67,17 @@
   background: rgba(255, 176, 58, 0.08);
   box-shadow: inset 0 0 16px rgba(255, 176, 58, 0.12);
 }
-.lg-brand-text { display: flex; flex-direction: column; gap: 2px; }
-.lg-brand-text b { font-size: 15px; font-weight: 800; letter-spacing: 0.08em; line-height: 1; }
+.lg-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.lg-brand-text b {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
 .lg-brand-text i {
   font-style: normal;
   font-family: var(--ff-mono);
@@ -81,10 +94,17 @@
   letter-spacing: 0.2em;
   color: var(--muted);
 }
-.lg-blink { animation: lg-blink 1.6s ease-in-out infinite; }
+.lg-blink {
+  animation: lg-blink 1.6s ease-in-out infinite;
+}
 @keyframes lg-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
 }
 
 /* ---------- 主面板 ---------- */
@@ -121,8 +141,7 @@
   padding: 28px 20px;
   border-right: 1px solid var(--line);
   background:
-    linear-gradient(170deg, rgba(255, 176, 58, 0.05), transparent 55%),
-    rgba(8, 12, 20, 0.5);
+    linear-gradient(170deg, rgba(255, 176, 58, 0.05), transparent 55%), rgba(8, 12, 20, 0.5);
 }
 .lg-radar {
   position: relative;
@@ -149,8 +168,12 @@
   background:
     linear-gradient(rgba(148, 163, 190, 0.14) 1px, transparent 1px),
     linear-gradient(90deg, rgba(148, 163, 190, 0.14) 1px, transparent 1px);
-  background-size: 100% 50%, 50% 100%;
-  background-position: 50% 50%, 50% 50%;
+  background-size:
+    100% 50%,
+    50% 100%;
+  background-position:
+    50% 50%,
+    50% 50%;
   background-repeat: no-repeat;
 }
 .lg-radar-sweep {
@@ -173,8 +196,12 @@
   box-shadow: 0 0 12px 2px rgba(255, 176, 58, 0.5);
 }
 @keyframes lg-sweep {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .lg-status {
@@ -186,7 +213,11 @@
   padding: 0;
   list-style: none;
 }
-.lg-status li { display: flex; align-items: center; gap: 8px; }
+.lg-status li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .lg-st-k {
   flex: none;
   font-family: var(--ff-mono);
@@ -231,8 +262,16 @@
   color: var(--muted);
 }
 
-.lg-fields { display: flex; flex-direction: column; gap: 14px; }
-.lg-field { display: flex; flex-direction: column; gap: 7px; }
+.lg-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.lg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
 .lg-field-label {
   font-family: var(--ff-mono);
   font-size: 10px;
@@ -248,13 +287,18 @@
   border: 1px solid rgba(148, 163, 190, 0.22);
   border-radius: 10px;
   background: rgba(12, 17, 27, 0.72);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 .lg-input:focus-within {
   border-color: rgba(255, 176, 58, 0.55);
   box-shadow: 0 0 0 4px rgba(255, 176, 58, 0.1);
 }
-.lg-input-icon { flex: none; color: var(--faint); }
+.lg-input-icon {
+  flex: none;
+  color: var(--faint);
+}
 .lg-input input {
   flex: 1;
   min-width: 0;
@@ -266,7 +310,9 @@
   font-family: inherit;
   user-select: text;
 }
-.lg-input input::placeholder { color: var(--faint); }
+.lg-input input::placeholder {
+  color: var(--faint);
+}
 .lg-eye {
   flex: none;
   display: grid;
@@ -280,8 +326,13 @@
   border-radius: 6px;
   transition: color 0.18s;
 }
-.lg-eye:hover { color: var(--amber); }
-.lg-eye:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+.lg-eye:hover {
+  color: var(--amber);
+}
+.lg-eye:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 1px;
+}
 
 .lg-btn {
   display: flex;
@@ -299,16 +350,27 @@
   letter-spacing: 0.08em;
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(255, 176, 58, 0.28);
-  transition: transform 0.18s, box-shadow 0.25s, filter 0.25s;
+  transition:
+    transform 0.18s,
+    box-shadow 0.25s,
+    filter 0.25s;
 }
 .lg-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   filter: brightness(1.06);
   box-shadow: 0 12px 30px rgba(255, 176, 58, 0.38);
 }
-.lg-btn:active:not(:disabled) { transform: translateY(0); }
-.lg-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-.lg-btn:disabled { opacity: 0.75; cursor: progress; }
+.lg-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+.lg-btn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+.lg-btn:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
 .lg-btn-dot {
   width: 9px;
   height: 9px;
@@ -339,7 +401,11 @@
   letter-spacing: 0.2em;
   color: var(--faint);
 }
-.lg-foot-sep { width: 1px; height: 10px; background: rgba(148, 163, 190, 0.3); }
+.lg-foot-sep {
+  width: 1px;
+  height: 10px;
+  background: rgba(148, 163, 190, 0.3);
+}
 
 /* ---------- 入场动效 ---------- */
 .lg-reveal {
@@ -347,31 +413,70 @@
   animation: lg-rise 0.65s cubic-bezier(0.22, 0.9, 0.28, 1) var(--d, 0ms) both;
 }
 @keyframes lg-rise {
-  from { opacity: 0; transform: translateY(14px); filter: blur(6px); }
-  to { opacity: 1; transform: none; filter: blur(0); }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
 }
 
 /* ---------- 矮窗口适配 ---------- */
 @media (max-height: 700px) {
-  .lg-root { padding-top: 16px; padding-bottom: 14px; }
-  .lg-main { padding: 16px 0; }
-  .lg-side { width: 200px; gap: 16px; padding: 20px 16px; }
-  .lg-radar { width: 130px; }
-  .lg-form { gap: 6px; padding: 22px 30px; }
-  .lg-fields { gap: 11px; }
-  .lg-input { height: 40px; }
-  .lg-btn { height: 42px; margin-top: 14px; }
-  .lg-sub { margin-bottom: 12px; }
+  .lg-root {
+    padding-top: 16px;
+    padding-bottom: 14px;
+  }
+  .lg-main {
+    padding: 16px 0;
+  }
+  .lg-side {
+    width: 200px;
+    gap: 16px;
+    padding: 20px 16px;
+  }
+  .lg-radar {
+    width: 130px;
+  }
+  .lg-form {
+    gap: 6px;
+    padding: 22px 30px;
+  }
+  .lg-fields {
+    gap: 11px;
+  }
+  .lg-input {
+    height: 40px;
+  }
+  .lg-btn {
+    height: 42px;
+    margin-top: 14px;
+  }
+  .lg-sub {
+    margin-bottom: 12px;
+  }
 }
 
 /* ---------- 窄窗口适配 ---------- */
 @media (max-width: 720px) {
-  .lg-side { display: none; }
-  .lg-panel { width: min(420px, 100%); }
+  .lg-side {
+    display: none;
+  }
+  .lg-panel {
+    width: min(420px, 100%);
+  }
 }
 @media (max-width: 400px) {
-  .lg-root { padding: 18px 16px 14px; }
-  .lg-top-status { display: none; }
+  .lg-root {
+    padding: 18px 16px 14px;
+  }
+  .lg-top-status {
+    display: none;
+  }
 }
 
 /* ---------- 减少动效 ---------- */

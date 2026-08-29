@@ -36,7 +36,7 @@ const Layout = () => {
                 end={end}
                 className={({ isActive }) => (isActive ? 's-nav-item s-nav-active' : 's-nav-item')}
               >
-                <Icon size={16} strokeWidth={2} />
+                <Icon size={14} strokeWidth={2} />
                 <span>{label}</span>
               </NavLink>
             ))}
