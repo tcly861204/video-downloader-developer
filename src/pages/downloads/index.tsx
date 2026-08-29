@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { Clapperboard, FolderOpen, Pause, Play, RotateCw, Trash2 } from 'lucide-react'
 import { useDownloadStore, type TaskStatus } from '@/store/download'
 import { formatBytes, formatEta, formatSpeed, formatTime } from '@/utils/format'
+import { parseUrl } from '@/utils/parse'
 
 type Tab = 'all' | 'active' | 'done' | 'failed'
 
@@ -53,6 +54,11 @@ const Downloads = () => {
   useEffect(() => {
     const store = useDownloadStore.getState()
     if (store.tasks.length === 0) store.seed()
+    const url = store.pendingUrl
+    if (url) {
+      store.setPendingUrl(null)
+      store.addParsed(parseUrl(url))
+    }
     const id = setInterval(() => useDownloadStore.getState().tick(), 1000)
     return () => clearInterval(id)
   }, [])

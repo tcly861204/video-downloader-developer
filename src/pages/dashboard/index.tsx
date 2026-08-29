@@ -1,5 +1,7 @@
-import { useState, type CSSProperties, type FormEvent } from 'react'
+import { useState, type CSSProperties, type SubmitEvent as ReactSubmitEvent } from 'react'
 import { Archive, ArrowRight, Film, Globe, Link2, Zap, type LucideIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useDownloadStore } from '@/store/download'
 
 const PLATFORMS = ['哔哩哔哩', 'YouTube', '抖音', '快手', 'TikTok', 'Vimeo', 'X · Twitter']
 
@@ -53,10 +55,18 @@ const reveal = (d: string): CSSProperties => ({ '--d': d }) as CSSProperties
 const Dashboard = () => {
   const [link, setLink] = useState('')
   const [hint, setHint] = useState('')
+  const navigate = useNavigate()
+  const setPendingUrl = useDownloadStore((s) => s.setPendingUrl)
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: ReactSubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setHint(link.trim() ? '✦ 信号已接收 · 解析引擎接入中，敬请期待' : '✦ 请输入一个视频链接')
+    const trimmed = link.trim()
+    if (!trimmed) {
+      setHint('✦ 请输入一个视频链接')
+      return
+    }
+    setPendingUrl(trimmed)
+    navigate('/downloads')
   }
 
   return (

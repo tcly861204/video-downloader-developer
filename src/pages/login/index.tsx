@@ -1,6 +1,6 @@
-import { useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode, type SubmitEvent as ReactSubmitEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Lock, LogIn, RadioTower, User } from 'lucide-react'
+import { Eye, EyeOff, Lock, LogIn, User } from 'lucide-react'
 
 const reveal = (d: string): CSSProperties => ({ '--d': d }) as CSSProperties
 
@@ -41,7 +41,7 @@ const Login = () => {
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
 
-  const submit = (e: FormEvent) => {
+  const submit = (e: ReactSubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (busy) return
     if (!user.trim() || !pass) {

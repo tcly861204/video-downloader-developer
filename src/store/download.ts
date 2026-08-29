@@ -20,9 +20,21 @@ export interface DownloadTask {
 
 export type NewTask = Omit<DownloadTask, 'id' | 'downloaded' | 'speed' | 'createdAt'>
 
+export interface ParsedMeta {
+  title: string
+  platform: string
+  quality: string
+  size: number
+}
+
 interface DownloadState {
   tasks: DownloadTask[]
+  /** 首页粘贴后待解析的链接，跳转前写入、下载页消费后清空 */
+  pendingUrl: string | null
   addTask: (data: NewTask) => void
+  /** 解析结果直接入队并立即开始下载（演示） */
+  addParsed: (meta: ParsedMeta) => void
+  setPendingUrl: (url: string | null) => void
   /** 演示用：让所有 downloading 任务推进一秒 */
   tick: () => void
   pause: (id: string) => void
@@ -110,6 +122,7 @@ let demoSeeded = false
 
 export const useDownloadStore = create<DownloadState>((set) => ({
   tasks: [],
+  pendingUrl: null,
 
   addTask: (data) =>
     set((s) => ({
@@ -118,6 +131,23 @@ export const useDownloadStore = create<DownloadState>((set) => ({
         { ...data, id: nanoid(), downloaded: 0, speed: 0, createdAt: Date.now() },
       ],
     })),
+
+  addParsed: (meta) =>
+    set((s) => ({
+      tasks: [
+        ...s.tasks,
+        {
+          ...meta,
+          id: nanoid(),
+          downloaded: 0,
+          speed: 2.6 * MB,
+          status: 'downloading' as const,
+          createdAt: Date.now(),
+        },
+      ],
+    })),
+
+  setPendingUrl: (url) => set({ pendingUrl: url }),
 
   tick: () =>
     set((s) => ({
