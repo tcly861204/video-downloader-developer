@@ -11,3 +11,50 @@
   --ff-mono: 'IBM Plex Mono', 'Cascadia Mono', 'Consolas', monospace;
   --ff-sans: 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
 }
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--ff-sans);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 190, 0.16);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 176, 58, 0.35);
+}
+
+/* ---------- 共享组件类 ---------- */
+.s-kicker {
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: var(--amber);
+}
+
+.s-title {
+  margin: 8px 0 0;
+  font-family: var(--ff-serif);
+  font-size: clamp(24px, 2.6vw, 34px);
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+  color: var(--text);
+}

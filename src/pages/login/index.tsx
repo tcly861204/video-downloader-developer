@@ -1,42 +1,11 @@
-import {
-  useState,
-  type CSSProperties,
-  type ReactNode,
-  type SubmitEvent as ReactSubmitEvent,
-} from 'react'
+import { useState, type CSSProperties, type SubmitEvent as ReactSubmitEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Lock, LogIn, User } from 'lucide-react'
 import { Background } from '@/components/background'
+import { Field } from '@/components/field'
+import { SignalPanel } from '@/components/signal-panel'
+import styles from './index.module.scss'
 const reveal = (d: string): CSSProperties => ({ '--d': d }) as CSSProperties
-
-function Field({
-  label,
-  icon: Icon,
-  children,
-  ...rest
-}: {
-  label: string
-  icon: typeof User
-  children?: ReactNode
-} & React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <label className='lg-field'>
-      <span className='lg-field-label'>{label}</span>
-      <div className='lg-input'>
-        <Icon size={15} strokeWidth={2} className='lg-input-icon' />
-        <input {...rest} />
-        {children}
-      </div>
-    </label>
-  )
-}
-
-const STATUS_LINES: [string, string][] = [
-  ['STATION', '拾帧 · FRAMECATCH'],
-  ['UPLINK', 'REQUIRED'],
-  ['CIPHER', 'AES-256'],
-  ['CHANNEL', 'PRIVATE'],
-]
 
 const Login = () => {
   const nav = useNavigate()
@@ -59,61 +28,29 @@ const Login = () => {
   }
 
   return (
-    <section className='lg-root p-3 pb-0'>
+    <section className={`${styles.login} p-3 pb-0`}>
       {/* ===== 背景层 ===== */}
       <Background />
 
-      {/* ===== 顶栏 ===== */}
-      {/* <header className='lg-top'>
-        <div className='lg-brand'>
-          <span className='lg-logo'>
-            <RadioTower size={18} strokeWidth={2.2} />
-          </span>
-          <span className='lg-brand-text'>
-            <b>拾帧</b>
-            <i>FRAMECATCH</i>
-          </span>
-        </div>
-        <span className='lg-top-status'>
-          <span className='s-dot s-dot--amber lg-blink' aria-hidden />
-          UPLINK STANDBY
-        </span>
-      </header> */}
-
       {/* ===== 登录面板 ===== */}
-      <main className='lg-main'>
-        <div className='lg-panel'>
+      <main className={styles.main}>
+        <div className={styles.panel}>
           {/* ---- 信号侧栏 ---- */}
-          <aside className='lg-side' aria-hidden>
-            <div className='lg-radar'>
-              <span className='lg-radar-rings' />
-              {/* <span className='lg-radar-cross' /> */}
-              <span className='lg-radar-sweep' />
-            </div>
-            <ul className='lg-status'>
-              {STATUS_LINES.map(([k, v]) => (
-                <li key={k}>
-                  <span className='lg-st-k'>{k}</span>
-                  <i className='lg-st-line' aria-hidden />
-                  <span className='lg-st-v'>{v}</span>
-                </li>
-              ))}
-            </ul>
-          </aside>
+          <SignalPanel />
 
           {/* ---- 表单 ---- */}
-          <form className='lg-form' onSubmit={submit}>
-            <p className='s-kicker lg-reveal' style={reveal('80ms')}>
+          <form className={styles.form} onSubmit={submit}>
+            <p className={`s-kicker ${styles.reveal}`} style={reveal('80ms')}>
               /// ACCESS GATE
             </p>
-            <h1 className='lg-title lg-reveal' style={reveal('220ms')}>
+            <h1 className={`lg-title ${styles.reveal}`} style={reveal('220ms')}>
               登录
             </h1>
-            <p className='lg-sub lg-reveal' style={reveal('340ms')}>
+            <p className={`${styles.sub} ${styles.reveal}`} style={reveal('340ms')}>
               输入凭证，接入你的下载控制台。
             </p>
 
-            <div className='lg-fields lg-reveal' style={reveal('460ms')}>
+            <div className={`${styles.fields} ${styles.reveal}`} style={reveal('460ms')}>
               <Field
                 label='USER_ID'
                 icon={User}
@@ -141,7 +78,6 @@ const Login = () => {
               >
                 <button
                   type='button'
-                  className='lg-eye'
                   aria-label={show ? '隐藏密码' : '显示密码'}
                   onClick={() => setShow((v) => !v)}
                 >
@@ -152,13 +88,13 @@ const Login = () => {
 
             <button
               type='submit'
-              className='lg-btn lg-reveal'
+              className={`${styles.btn} ${styles.reveal}`}
               style={reveal('580ms')}
               disabled={busy}
             >
               {busy ? (
                 <>
-                  <span className='lg-btn-dot' aria-hidden />
+                  <span className={styles.dot} aria-hidden />
                   正在验证
                 </>
               ) : (
@@ -169,7 +105,7 @@ const Login = () => {
               )}
             </button>
 
-            <p className='lg-hint' role='status'>
+            <p className={styles.hint} role='status'>
               {err || (busy ? '✦ 信号已握手 · 正在跳转…' : '')}
             </p>
           </form>
@@ -177,9 +113,9 @@ const Login = () => {
       </main>
 
       {/* ===== 页脚 ===== */}
-      <footer className='lg-foot py-4'>
+      <footer className={`${styles.foot} py-4`}>
         <span>SIGNAL FEED · V0.1.0</span>
-        <span className='lg-foot-sep' aria-hidden />
+        <span className={styles.sep} aria-hidden />
         <span>© 2026 FRAMECATCH</span>
       </footer>
     </section>

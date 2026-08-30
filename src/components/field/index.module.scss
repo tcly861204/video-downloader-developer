@@ -1,0 +1,89 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  .label {
+    font-family: var(--ff-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--faint);
+  }
+
+  .input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid rgba(148, 163, 190, 0.22);
+    border-radius: 10px;
+    background: rgba(12, 17, 27, 0.72);
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+
+    &:focus-within {
+      border-color: rgba(255, 176, 58, 0.55);
+      box-shadow: 0 0 0 4px rgba(255, 176, 58, 0.1);
+    }
+
+    .icon {
+      flex: none;
+      color: var(--faint);
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 14.5px;
+      font-family: inherit;
+      user-select: text;
+
+      &::placeholder {
+        color: var(--faint);
+      }
+    }
+
+    /* 隐藏浏览器原生密码眼睛/清除/自动填充图标，避免与自绘 eye 重叠 */
+    input[type='password']::-ms-reveal,
+    input[type='password']::-ms-clear {
+      display: none;
+    }
+    input::-webkit-credentials-auto-fill-button {
+      display: none;
+    }
+
+    > button {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border: none;
+      background: transparent;
+      color: var(--faint);
+      cursor: pointer;
+      border-radius: 6px;
+      transition: color 0.18s;
+
+      &:hover {
+        color: var(--amber);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--amber);
+        outline-offset: 1px;
+      }
+    }
+  }
+}
+
+@media (max-height: 700px) {
+  .field .input {
+    height: 40px;
+  }
+}
