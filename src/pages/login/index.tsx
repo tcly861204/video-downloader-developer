@@ -43,7 +43,7 @@ const Login = () => {
             <p className={`s-kicker ${styles.reveal}`} style={reveal('80ms')}>
               /// ACCESS GATE
             </p>
-            <h1 className={`lg-title ${styles.reveal}`} style={reveal('220ms')}>
+            <h1 className={`${styles.title} ${styles.reveal}`} style={reveal('220ms')}>
               登录
             </h1>
             <p className={`${styles.sub} ${styles.reveal}`} style={reveal('340ms')}>
