@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { invoke } from '@tauri-apps/api/core'
 
 export type Quality = 'original' | '1080' | '720' | '480'
 export type FilenameRule = 'title' | 'title-platform' | 'title-quality'
@@ -17,25 +17,51 @@ export interface AppSettings {
   notifyFail: boolean
 }
 
+const DEFAULTS: AppSettings = {
+  saveDir: '',
+  defaultQuality: '1080',
+  concurrency: 3,
+  filenameRule: 'title',
+  resume: true,
+  proxyEnabled: false,
+  proxyHost: '127.0.0.1',
+  proxyPort: '7890',
+  notifyDone: true,
+  notifyFail: true,
+}
+
 interface SettingsState extends AppSettings {
+  /** 从 Rust 读取用户目录下的配置文件，覆盖当前状态 */
+  hydrate: () => Promise<void>
+  /** 更新设置并延迟写回磁盘 */
   set: (patch: Partial<AppSettings>) => void
 }
 
-export const useSettingsStore = create<SettingsState>()(
-  persist(
-    (set) => ({
-      saveDir: 'C:/Users/Administrator/Videos/拾帧',
-      defaultQuality: '1080',
-      concurrency: 3,
-      filenameRule: 'title',
-      resume: true,
-      proxyEnabled: false,
-      proxyHost: '127.0.0.1',
-      proxyPort: '7890',
-      notifyDone: true,
-      notifyFail: true,
-      set: (patch) => set(patch),
-    }),
-    { name: 'framecatch-settings' },
-  ),
-)
+let saveTimer: ReturnType<typeof setTimeout> | null = null
+
+function persistSettings(state: AppSettings) {
+  if (saveTimer) clearTimeout(saveTimer)
+  saveTimer = setTimeout(() => {
+    invoke('save_settings', { settings: state }).catch(() => {
+      /* 非 Tauri 环境或写入失败时静默，内存态仍可用 */
+    })
+  }, 400)
+}
+
+export const useSettingsStore = create<SettingsState>((set, get) => ({
+  ...DEFAULTS,
+
+  hydrate: async () => {
+    try {
+      const s = await invoke<AppSettings>('get_settings')
+      set(s)
+    } catch {
+      /* 读取失败则保持默认值 */
+    }
+  },
+
+  set: (patch) => {
+    set(patch)
+    persistSettings({ ...get(), ...patch })
+  },
+}))

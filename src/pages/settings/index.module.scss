@@ -41,8 +41,11 @@
 }
 
 .path {
+  display: flex;
+  align-items: center;
+  height: 34px;
   max-width: 240px;
-  padding: 7px 10px;
+  padding: 0 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(148, 163, 190, 0.07);

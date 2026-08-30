@@ -8,12 +8,20 @@
 }
 
 .opt {
-  padding: 6px 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0 13px;
+  box-sizing: border-box;
   border: none;
   border-radius: 6px;
   background: transparent;
   color: var(--muted);
+  font-family: var(--ff-sans);
   font-size: 12.5px;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     color 0.18s,
