@@ -1,53 +1,23 @@
-import { NavLink, Outlet } from 'react-router-dom'
-import { House, LogIn, MonitorDown, RadioTower, Settings, type LucideIcon } from 'lucide-react'
-
-const NAV: { to: string; label: string; icon: LucideIcon; end?: boolean }[] = [
-  { to: '/', label: '首页', icon: House, end: true },
-  { to: '/downloads', label: '下载', icon: MonitorDown },
-  { to: '/settings', label: '设置', icon: Settings },
-  { to: '/login', label: '登录', icon: LogIn },
-]
-
+import { Outlet, useLocation } from 'react-router-dom'
+import { Header } from '@/components/header'
+import { Sidebar } from '@/components/sidebar'
 const Layout = () => {
+  const local = useLocation()
   return (
     <section className='s-shell'>
       {/* ===== 共享背景层 ===== */}
       <div className='s-bg-grid' aria-hidden />
       <div className='s-bg-noise' aria-hidden />
       <div className='s-vignette' aria-hidden />
-
       {/* ===== 顶部导航 ===== */}
-      <header className='s-top'>
-        <div className='s-brand'>
-          <span className='s-logo'>
-            <RadioTower size={18} strokeWidth={2.2} />
-          </span>
-          <span className='s-brand-text'>
-            <b>拾帧</b>
-            <i>FRAMECATCH</i>
-          </span>
-        </div>
-        <div className='s-navside'>
-          <nav className='s-nav' aria-label='主导航'>
-            {NAV.map(({ to, label, icon: Icon, end }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                className={({ isActive }) => (isActive ? 's-nav-item s-nav-active' : 's-nav-item')}
-              >
-                <Icon size={14} strokeWidth={2} />
-                <span>{label}</span>
-              </NavLink>
-            ))}
-          </nav>
-        </div>
-      </header>
-
+      <Header />
       {/* ===== 内容区 ===== */}
-      <main className='s-main'>
-        <Outlet />
-      </main>
+      <section className='flex-1 flex'>
+        {local.pathname === '/' || local.pathname === '/login' ? null : <Sidebar />}
+        <main className='s-main'>
+          <Outlet />
+        </main>
+      </section>
     </section>
   )
 }

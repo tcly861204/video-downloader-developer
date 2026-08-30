@@ -4,6 +4,7 @@ if (import.meta.env.MODE !== 'development') {
 import 'virtual:uno.css'
 import './styles/theme.css'
 import './styles/layout.css'
+import './styles/sidebar.css'
 import './styles/dashboard.css'
 import './styles/downloads.css'
 import './styles/settings.css'

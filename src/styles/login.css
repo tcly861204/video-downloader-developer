@@ -313,6 +313,14 @@
 .lg-input input::placeholder {
   color: var(--faint);
 }
+/* 隐藏浏览器原生密码眼睛/清除/自动填充图标，避免与自绘 eye 重叠 */
+.lg-input input[type='password']::-ms-reveal,
+.lg-input input[type='password']::-ms-clear {
+  display: none;
+}
+.lg-input input::-webkit-credentials-auto-fill-button {
+  display: none;
+}
 .lg-eye {
   flex: none;
   display: grid;
