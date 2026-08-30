@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { House, LogIn, MonitorDown, Settings, type LucideIcon } from 'lucide-react'
+import { House, MonitorDown, Settings, type LucideIcon } from 'lucide-react'
 import styles from './index.module.scss'
 const NAV: {
   to: string
@@ -12,7 +12,7 @@ const NAV: {
   { to: '/', key: 'home', label: '首页', en: 'HOME', icon: House, end: true },
   { to: '/downloads', key: 'download', label: '下载', en: 'DOWNLOADS', icon: MonitorDown },
   { to: '/settings', key: 'setting', label: '设置', en: 'SETTINGS', icon: Settings },
-  { to: '/login', key: 'login', label: '登录', en: 'SIGN IN', icon: LogIn },
+  // { to: '/login', key: 'login', label: '登录', en: 'SIGN IN', icon: LogIn },
 ]
 export const Sidebar = () => {
   return (

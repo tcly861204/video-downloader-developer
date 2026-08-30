@@ -42,6 +42,12 @@ export interface DownloadTask {
   playUrl: string
   /** 视频封面图 URL，解析时带回，任务行缩略图使用 */
   cover?: string
+  /**
+   * 是否被用户「点过下载」。
+   * 只有 requested 的任务才会在并发槽位空闲时自动接力，
+   * 解析出来的未点击任务不会被顺带下载。
+   */
+  requested?: boolean
   savePath?: string
   error?: string
 }
@@ -51,7 +57,7 @@ interface DownloadState {
   /** 首页粘贴后待解析的链接，跳转前写入、下载页消费后清空 */
   pendingUrl: string | null
   setPendingUrl: (url: string | null) => void
-  /** 解析链接并入队（自动尝试下载）；失败时抛出给页面显示 */
+  /** 解析链接并入队（不自动下载）；失败时抛出给页面显示 */
   parseAndAdd: (text: string) => Promise<void>
   start: (id: string) => Promise<void>
   pause: (id: string) => Promise<void>
@@ -96,7 +102,7 @@ function applyDone(p: DownloadDone) {
         : t,
     ),
   }))
-  kickQueue()
+  kickArmed()
 }
 
 function applyError(p: DownloadError) {
@@ -108,19 +114,21 @@ function applyError(p: DownloadError) {
         : t,
     ),
   }))
-  kickQueue()
+  kickArmed()
 }
 
 /**
- * 有空闲并发槽位时，依次启动排队中的任务。
- * 在任何任务结束 / 暂停后调用，让队列自动接力。
+ * 有空闲并发槽位时，依次启动「用户点击过下载」且仍排队的任务。
+ * 纯解析出来的任务（requested=false）不会被顺带下载；
+ * 只有「全部开始」会主动把未下载的任务都标记为 requested。
+ * 在任务结束 / 暂停 / 移除后调用，让已请求的任务自动接力。
  */
-function kickQueue() {
+function kickArmed() {
   const s = useDownloadStore.getState()
   const concurrency = useSettingsStore.getState().concurrency || 1
   let active = s.tasks.filter((t) => t.status === 'downloading').length
   for (const t of s.tasks) {
-    if (t.status !== 'queued' || active >= concurrency) continue
+    if (t.status !== 'queued' || !t.requested || active >= concurrency) continue
     void s.start(t.id)
     active += 1
   }
@@ -162,8 +170,9 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
       awemeId: info.awemeId,
       playUrl: info.playUrl,
       cover: info.cover || undefined,
+      // 解析出来的任务默认不自动下载，等用户点击「下载」才标记 requested
+      requested: false,
     }
-    // 解析后仅入队，由用户在任务行点击「下载」再开始
     set((s) => ({ tasks: [task, ...s.tasks] }))
   },
 
@@ -171,14 +180,21 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
     const task = get().tasks.find((t) => t.id === id)
     if (!task || task.status === 'downloading') return
 
-    // 并发槽位检查：已满则保持 queued，等 kickQueue 自动启动
+    // 并发槽位检查：已满则标记为「已请求」，等有空位时自动开始
     const concurrency = useSettingsStore.getState().concurrency || 1
     const active = get().tasks.filter((t) => t.status === 'downloading').length
-    if (active >= concurrency) return
+    if (active >= concurrency) {
+      set((s) => ({
+        tasks: s.tasks.map((t) =>
+          t.id === id ? { ...t, status: 'queued', requested: true } : t,
+        ),
+      }))
+      return
+    }
 
     set((s) => ({
       tasks: s.tasks.map((t) =>
-        t.id === id ? { ...t, status: 'downloading', error: undefined } : t,
+        t.id === id ? { ...t, status: 'downloading', requested: true, error: undefined } : t,
       ),
     }))
 
@@ -192,13 +208,13 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
         quality: task.quality,
       })
     } catch (e) {
-      // 启动失败（如无法建连）→ 置失败，并让队列接力
+      // 启动失败（如无法建连）→ 置失败，让已请求的任务接力
       set((s) => ({
         tasks: s.tasks.map((t) =>
-          t.id === id ? { ...t, status: 'failed', error: String(e) } : t,
+          t.id === id ? { ...t, status: 'failed', error: String(e), requested: false } : t,
         ),
       }))
-      kickQueue()
+      kickArmed()
     }
   },
 
@@ -211,7 +227,8 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
     set((s) => ({
       tasks: s.tasks.map((t) => (t.id === id ? { ...t, status: 'paused', speed: 0 } : t)),
     }))
-    kickQueue()
+    // 空出的并发槽位让「已请求」的任务接力
+    kickArmed()
   },
 
   resume: async (id) => {
@@ -230,7 +247,7 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
     if (task?.status === 'downloading') void cancelDownload(id).catch(() => {})
     delete samples[id]
     set((s) => ({ tasks: s.tasks.filter((t) => t.id !== id) }))
-    kickQueue()
+    kickArmed()
   },
 
   clearCompleted: () =>
@@ -248,12 +265,16 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
   },
 
   resumeAll: () => {
+    // 「全部开始」：把已暂停 + 仍排队的任务都标记为 requested，
+    // 让 kickArmed 依次把未下载的任务下载完（受并发数约束）。
     set((s) => ({
       tasks: s.tasks.map((t) =>
-        t.status === 'paused' ? { ...t, status: 'queued', error: undefined } : t,
+        t.status === 'paused' || t.status === 'queued'
+          ? { ...t, status: 'queued', requested: true, error: undefined }
+          : t,
       ),
     }))
-    kickQueue()
+    kickArmed()
   },
 }))
 
