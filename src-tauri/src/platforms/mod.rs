@@ -6,6 +6,7 @@
 
 pub mod bilibili;
 pub mod douyin;
+pub mod haokan;
 pub mod kuaishou;
 
 use serde::Serialize;
@@ -66,6 +67,9 @@ pub async fn parse(text: &str, proxy: &ProxyCfg) -> Result<VideoInfo, String> {
     if bilibili::can_handle(text) {
         return bilibili::parse(&client, text).await;
     }
+    if haokan::can_handle(text) {
+        return haokan::parse(&client, text).await;
+    }
 
-    Err("未识别的链接，目前仅支持抖音、快手和哔哩哔哩分享链接".into())
+    Err("未识别的链接，目前仅支持抖音、快手、哔哩哔哩和好看视频分享链接".into())
 }

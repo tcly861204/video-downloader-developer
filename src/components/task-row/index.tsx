@@ -17,6 +17,7 @@ const PLATFORM_COLORS: Record<string, string> = {
   YouTube: '#ff4d5a',
   抖音: '#25f4ee',
   快手: '#ff6b3d',
+  好看视频: '#2e7cf6',
   TikTok: '#69c9ff',
   Vimeo: '#1ab7ea',
   'X · Twitter': '#7aa2ff',

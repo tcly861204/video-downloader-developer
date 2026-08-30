@@ -89,6 +89,20 @@ fn build_prefix(title: &str, platform: &str, quality: &str, rule: FilenameRule) 
     }
 }
 
+/// 去重：目录里已存在以 `_{aweme_id}.mp4` 结尾的文件即视为该视频已下载。
+/// 用 aweme_id 后缀而非完整文件名匹配，兼容标题 / 命名规则 / 清晰度变化导致文件名不同的情况。
+fn find_existing_video(dir: &Path, aweme_id: &str) -> Option<String> {
+    let suffix = format!("_{aweme_id}.mp4");
+    for entry in std::fs::read_dir(dir).ok()?.flatten() {
+        let os_name = entry.file_name();
+        let name = os_name.to_string_lossy();
+        if name.ends_with(&suffix) {
+            return Some(entry.path().to_string_lossy().to_string());
+        }
+    }
+    None
+}
+
 /// 已存在同名文件时追加 `(n)` 后缀，返回不冲突的路径
 fn unique_path(dir: &Path, stem: &str, ext: &str) -> PathBuf {
     let mut path = dir.join(format!("{stem}{ext}"));
@@ -111,6 +125,8 @@ fn referer_for(url: &str) -> &'static str {
         || url.contains("chenzhongtech")
     {
         "https://www.kuaishou.com/"
+    } else if url.contains("haokan") || url.contains("bdstatic") {
+        "https://haokan.baidu.com/"
     } else {
         "https://www.douyin.com/"
     }
@@ -191,11 +207,15 @@ pub async fn run(
 
     let prefix = build_prefix(title, platform, quality, rule);
     let stem = format!("{prefix}_{aweme_id}");
-    // 已存在完整文件：直接视为完成，避免重复下载
-    if dir.join(format!("{stem}.mp4")).exists() {
-        let path = dir.join(format!("{stem}.mp4"));
-        let path_str = path.to_string_lossy().to_string();
-        let _ = app.emit("download-done", DownloadDone { task_id: task_id.to_string(), path: path_str });
+    // 去重：已存在该视频的文件则直接视为完成，跳过下载
+    if let Some(existing) = find_existing_video(&dir, aweme_id) {
+        let _ = app.emit(
+            "download-done",
+            DownloadDone {
+                task_id: task_id.to_string(),
+                path: existing,
+            },
+        );
         return;
     }
 
@@ -306,4 +326,45 @@ pub async fn run(
     }
     let final_str = final_path.to_string_lossy().to_string();
     let _ = app.emit("download-done", DownloadDone { task_id: task_id.to_string(), path: final_str });
+}
+
+// ============================================================
+// 单元测试（纯文件逻辑，不依赖网络）
+// ============================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn temp_dir() -> PathBuf {
+        let dir = std::env::temp_dir().join(format!("fdt_test_{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    #[test]
+    fn find_existing_video_matches_any_prefix() {
+        let dir = temp_dir();
+        std::fs::write(dir.join("旧标题_12345.mp4"), b"x").unwrap();
+        std::fs::write(dir.join("无关_99999.mp4"), b"x").unwrap();
+        // 半截文件不应命中去重（断点续传要继续下载）
+        std::fs::write(dir.join("半截_12345.mp4.part"), b"x").unwrap();
+
+        let found = find_existing_video(&dir, "12345").expect("应命中已下载的视频");
+        assert!(found.ends_with("旧标题_12345.mp4"));
+
+        assert!(find_existing_video(&dir, "00000").is_none());
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn find_existing_video_matches_quality_variant() {
+        let dir = temp_dir();
+        // 同一视频因命名规则/清晰度不同产生了不同文件名
+        std::fs::write(dir.join("标题_好看视频_超清_12345.mp4"), b"x").unwrap();
+
+        let found = find_existing_video(&dir, "12345").expect("应命中清晰度变体");
+        assert!(found.ends_with("标题_好看视频_超清_12345.mp4"));
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
 }

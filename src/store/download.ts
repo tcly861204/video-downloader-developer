@@ -160,6 +160,10 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
 
   parseAndAdd: async (text) => {
     const info = await parseVideo(text)
+    // 去重：同 awemeId 已在列表（含已完成/失败）则不再重复入队，抛错让页面提示
+    if (get().tasks.some((t) => t.awemeId === info.awemeId)) {
+      throw `该视频已在下载列表中，无需重复添加`
+    }
     const settings = useSettingsStore.getState()
     const task: DownloadTask = {
       id: nanoid(),
@@ -185,7 +189,10 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
   enqueueBatch: (posts) => {
     const settings = useSettingsStore.getState()
     const quality = qualityLabel(settings.defaultQuality)
-    const created = posts.map((p): DownloadTask => {
+    // 去重：跳过已在下载列表中的作品（含已完成/失败）
+    const existingIds = new Set(get().tasks.map((t) => t.awemeId))
+    const fresh = posts.filter((p) => !existingIds.has(p.awemeId))
+    const created = fresh.map((p): DownloadTask => {
       const id = nanoid()
       return {
         id,
