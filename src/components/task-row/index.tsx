@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { Clapperboard, FolderOpen, Pause, Play, RotateCw, Trash2 } from 'lucide-react'
 import type { DownloadTask, TaskStatus } from '@/store/download'
 import { formatBytes, formatEta, formatSpeed, formatTime } from '@/utils/format'
@@ -50,15 +50,29 @@ export function TaskRow({
   onRemove: (id: string) => void
   onOpen: (id: string) => void
 }) {
+  const [coverFailed, setCoverFailed] = useState(false)
   const pct = task.size > 0 ? Math.min(100, Math.round((task.downloaded / task.size) * 100)) : 0
   const remaining = Math.max(0, task.size - task.downloaded)
   const color = PLATFORM_COLORS[task.platform] || 'var(--amber)'
   const isActive = task.status === 'downloading'
+  // 有封面且加载成功 → 显示封面；否则回退到占位图标
+  const showCover = !!task.cover && !coverFailed
 
   return (
     <article className={styles.row}>
       <div className={styles.thumb} style={{ '--pc': color } as CSSProperties}>
-        <Clapperboard size={18} strokeWidth={1.6} />
+        {showCover ? (
+          <img
+            className={styles.cover}
+            src={task.cover}
+            alt=''
+            loading='lazy'
+            referrerPolicy='no-referrer'
+            onError={() => setCoverFailed(true)}
+          />
+        ) : (
+          <Clapperboard size={18} strokeWidth={1.6} />
+        )}
         <i className={styles.pp} aria-hidden />
       </div>
 
@@ -105,7 +119,11 @@ export function TaskRow({
               <Pause size={14} />
             </button>
           ) : task.status === 'paused' || task.status === 'queued' ? (
-            <button className='s-btn s-btn--icon s-btn--primary' title='继续' onClick={() => onResume(task.id)}>
+            <button
+              className='s-btn s-btn--icon s-btn--primary'
+              title={task.status === 'queued' ? '下载' : '继续'}
+              onClick={() => onResume(task.id)}
+            >
               <Play size={14} />
             </button>
           ) : task.status === 'failed' ? (

@@ -30,6 +30,15 @@
   color: var(--pc);
 }
 
+.cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 7px;
+}
+
 .pp {
   position: absolute;
   right: -3px;
@@ -40,6 +49,7 @@
   background: var(--pc);
   box-shadow: 0 0 8px color-mix(in srgb, var(--pc) 70%, transparent);
   border: 2px solid #0d1320;
+  z-index: 1;
 }
 
 .body {

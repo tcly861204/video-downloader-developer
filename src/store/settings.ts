@@ -4,6 +4,20 @@ import { invoke } from '@tauri-apps/api/core'
 export type Quality = 'original' | '1080' | '720' | '480'
 export type FilenameRule = 'title' | 'title-platform' | 'title-quality'
 
+/** 清晰度枚举 → 展示文案（任务行、文件名规则共用） */
+export function qualityLabel(q: Quality): string {
+  switch (q) {
+    case 'original':
+      return '原画'
+    case '1080':
+      return '1080P'
+    case '720':
+      return '720P'
+    case '480':
+      return '480P'
+  }
+}
+
 export interface AppSettings {
   saveDir: string
   defaultQuality: Quality

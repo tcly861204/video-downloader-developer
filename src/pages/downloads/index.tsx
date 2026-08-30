@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Clapperboard, Pause, Play, RotateCw, Sparkles, Trash2 } from 'lucide-react'
+import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { useDownloadStore, type TaskStatus } from '@/store/download'
 import { formatBytes } from '@/utils/format'
-import { parseUrl } from '@/utils/parse'
 import { TaskRow } from '@/components/task-row'
 import { Segmented } from '@/components/segmented'
 import styles from './index.module.scss'
@@ -25,18 +25,47 @@ const Downloads = () => {
   const [tab, setTab] = useState<Tab>('all')
   const [mode, setMode] = useState<Mode>('single')
   const [link, setLink] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
 
+  // 消费首页写入的待解析链接
   useEffect(() => {
     const store = useDownloadStore.getState()
-    if (store.tasks.length === 0) store.seed()
     const url = store.pendingUrl
     if (url) {
       store.setPendingUrl(null)
-      store.addParsed(parseUrl(url))
+      store
+        .parseAndAdd(url)
+        .catch((e) => setError(typeof e === 'string' ? e : String(e)))
     }
-    const id = setInterval(() => useDownloadStore.getState().tick(), 1000)
-    return () => clearInterval(id)
   }, [])
+
+  // 解析单个链接并入队
+  const handleParse = async () => {
+    const trimmed = link.trim()
+    if (!trimmed || busy) return
+    setBusy(true)
+    setError('')
+    try {
+      await useDownloadStore.getState().parseAndAdd(trimmed)
+      setLink('')
+    } catch (e) {
+      setError(typeof e === 'string' ? e : String(e))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  // 批量模式暂未开放
+  const handleBatchHint = () => {
+    setError('批量主页下载开发中，敬请期待 —— 当前支持粘贴抖音单个视频分享链接')
+  }
+
+  // 打开已完成任务所在文件夹
+  const handleOpen = (id: string) => {
+    const t = tasks.find((x) => x.id === id)
+    if (t?.savePath) void revealItemInDir(t.savePath).catch(() => {})
+  }
 
   const { active, failed, list, counts, activeCount, totalBytes } = useMemo(() => {
     const active = tasks.filter((t) => ACTIVE_STATUS.includes(t.status))
@@ -90,7 +119,7 @@ const Downloads = () => {
           <div className={styles.chips}>
             {mode === 'single' ? (
               <>
-                <span className='s-tag'>抖音</span>
+                <span className='s-tag s-tag--on'>抖音</span>
                 <span className='s-tag'>快手</span>
                 <span className='s-tag'>哔哩哔哩</span>
                 <span className='s-tag'>YouTube</span>
@@ -117,12 +146,28 @@ const Downloads = () => {
           aria-label='粘贴视频链接'
         />
         <div className={styles.addActions}>
-          <button className='s-btn s-btn--primary' disabled={!link.trim()}>
+          <button
+            className='s-btn s-btn--primary'
+            disabled={!link.trim() || busy}
+            onClick={mode === 'single' ? handleParse : handleBatchHint}
+          >
             <Sparkles size={14} />
-            {mode === 'single' ? '解析并加入队列' : '解析主页作品'}
+            {busy
+              ? '解析中…'
+              : mode === 'single'
+                ? '解析并加入队列'
+                : '解析主页作品'}
           </button>
         </div>
       </section>
+
+      {/* ===== 错误提示 ===== */}
+      {error && (
+        <div className={`s-panel ${styles.errorBanner}`} role='alert'>
+          <span className='s-kicker'>// ERROR</span>
+          <p className={styles.errorText}>{error}</p>
+        </div>
+      )}
 
       {/* ===== 筛选 + 工具栏 ===== */}
       <div className={styles.toolbar}>
@@ -177,7 +222,7 @@ const Downloads = () => {
               onResume={actions.resume}
               onRetry={actions.retry}
               onRemove={actions.remove}
-              onOpen={() => {}}
+              onOpen={handleOpen}
             />
           ))
         )}

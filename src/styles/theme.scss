@@ -63,6 +63,7 @@ body {
   flex: 1;
   min-height: 100%;
   padding: 28px clamp(20px, 3vw, 40px) 32px;
+  box-sizing: border-box;
 }
 
 .s-panel {
@@ -80,6 +81,13 @@ body {
   border-radius: 6px;
   font-size: 11px;
   color: var(--muted);
+}
+
+/* 当前已支持的平台标签：琥珀高亮 */
+.s-tag--on {
+  border-color: rgba(255, 176, 58, 0.45);
+  background: rgba(255, 176, 58, 0.1);
+  color: var(--amber);
 }
 
 .s-btn {
