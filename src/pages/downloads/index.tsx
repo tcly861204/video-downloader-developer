@@ -38,9 +38,7 @@ const Downloads = () => {
     const url = store.pendingUrl
     if (url) {
       store.setPendingUrl(null)
-      store
-        .parseAndAdd(url)
-        .catch((e) => setError(typeof e === 'string' ? e : String(e)))
+      store.parseAndAdd(url).catch((e) => setError(typeof e === 'string' ? e : String(e)))
     }
   }, [])
 
@@ -76,7 +74,12 @@ const Downloads = () => {
     const done = tasks.filter((t) => t.status === 'completed')
     const failed = tasks.filter((t) => t.status === 'failed')
     const map = { all: tasks, active, done, failed }
-    const counts = { all: tasks.length, active: active.length, done: done.length, failed: failed.length }
+    const counts = {
+      all: tasks.length,
+      active: active.length,
+      done: done.length,
+      failed: failed.length,
+    }
     return {
       active,
       done,
@@ -143,7 +146,7 @@ const Downloads = () => {
           onChange={(e) => setLink(e.target.value)}
           placeholder={
             mode === 'single'
-              ? '粘贴分享文本或链接，例如：\n抖音：7.94 复制打开抖音… https://v.douyin.com/xxxx/\n快手：复制打开快手… https://v.kuaishou.com/xxxx/\n好看视频：复制链接打开好看视频… https://haokan.baidu.com/v?vid=xxxx'
+              ? '粘贴分享文本或链接，例如：\n抖音：7.94 复制打开抖音… https://v.douyin.com/xxxx/\n快手：复制打开快手… https://v.kuaishou.com/xxxx/'
               : '粘贴用户主页链接，例如：\nhttps://www.douyin.com/user/MS4wLjABAAAA…'
           }
           rows={3}
@@ -223,15 +226,27 @@ const Downloads = () => {
             <Play size={14} />
             全部开始
           </button>
-          <button className='s-btn' onClick={actions.pauseAll} disabled={active.filter((t) => t.status === 'downloading').length === 0}>
+          <button
+            className='s-btn'
+            onClick={actions.pauseAll}
+            disabled={active.filter((t) => t.status === 'downloading').length === 0}
+          >
             <Pause size={14} />
             全部暂停
           </button>
-          <button className='s-btn' onClick={() => failed.forEach((t) => actions.retry(t.id))} disabled={counts.failed === 0}>
+          <button
+            className='s-btn'
+            onClick={() => failed.forEach((t) => actions.retry(t.id))}
+            disabled={counts.failed === 0}
+          >
             <RotateCw size={14} />
             重试失败
           </button>
-          <button className='s-btn s-btn--danger' onClick={actions.clearCompleted} disabled={counts.done === 0}>
+          <button
+            className='s-btn s-btn--danger'
+            onClick={actions.clearCompleted}
+            disabled={counts.done === 0}
+          >
             <Trash2 size={14} />
             清空已完成
           </button>

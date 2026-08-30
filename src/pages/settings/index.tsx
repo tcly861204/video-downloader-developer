@@ -147,22 +147,6 @@ const Settings = () => {
           </SettingRow>
         </div>
       </section>
-      {/* ===== 关于 ===== */}
-      <section className={`s-panel ${styles.panel}`}>
-        <header className={styles.panelHead}>
-          <span className='s-dot s-dot--ok' aria-hidden />
-          <p className={`s-kicker ${styles.kicker}`}>ABOUT</p>
-        </header>
-        <div className={styles.about}>
-          <span className={styles.aboutName}>拾帧 · FRAMECATCH</span>
-          <span className={styles.aboutEn}>MULTI-PLATFORM VIDEO DOWNLOADER</span>
-          <p className={styles.aboutDesc}>
-            把全网的视频收进你的设备。支持 Bilibili、YouTube、抖音、快手、好看视频、TikTok 等多个平台，
-            粘贴链接即可解析、离线珍藏你喜欢的每一帧画面。
-          </p>
-          <span className={styles.aboutMeta}>V0.1.0 · SIGNAL OK · © 2026</span>
-        </div>
-      </section>
     </section>
   )
 }

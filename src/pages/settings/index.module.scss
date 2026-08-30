@@ -91,43 +91,6 @@
   color: var(--faint);
 }
 
-.about {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 8px 0 4px;
-}
-
-.aboutName {
-  font-family: var(--ff-serif);
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: 0.05em;
-}
-
-.aboutEn {
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  letter-spacing: 0.28em;
-  color: var(--amber);
-}
-
-.aboutDesc {
-  margin: 4px 0 0;
-  max-width: 520px;
-  font-size: 12.5px;
-  line-height: 1.8;
-  color: var(--muted);
-}
-
-.aboutMeta {
-  margin-top: 8px;
-  font-family: var(--ff-mono);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  color: var(--faint);
-}
-
 @media (max-width: 640px) {
   .dir {
     max-width: 100%;

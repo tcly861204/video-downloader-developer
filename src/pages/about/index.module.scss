@@ -46,36 +46,41 @@
   min-width: 0;
 }
 
-/* ---------- 页头 ---------- */
-
-.head {
+.about {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-
-  h1 {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  gap: 6px;
+  padding: 8px 0 4px;
 }
 
-.titleAccent {
+.aboutName {
+  font-family: var(--ff-serif);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.aboutEn {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
   color: var(--amber);
-  text-shadow: 0 0 30px rgba(255, 176, 58, 0.32);
 }
 
-.titleDim {
-  color: var(--muted);
-}
-
-.sub {
-  max-width: min(680px, 100%);
-  margin: 2px 0 0;
-  font-size: 13px;
+.aboutDesc {
+  margin: 4px 0 0;
+  max-width: 520px;
+  font-size: 12.5px;
   line-height: 1.8;
   color: var(--muted);
+}
+
+.aboutMeta {
+  margin-top: 8px;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--faint);
 }
 
 /* ---------- 分节标题 ---------- */
@@ -114,7 +119,7 @@
 }
 
 .scanGrid {
-  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
 /* ---------- 平台卡 ---------- */
@@ -292,6 +297,14 @@
   border-style: dashed;
   opacity: 0.66;
   filter: saturate(0.55);
+
+  .name {
+    font-size: 19px;
+  }
+
+  .en {
+    letter-spacing: 0.18em;
+  }
 
   /* 横向扫描扫光 */
   &::after {

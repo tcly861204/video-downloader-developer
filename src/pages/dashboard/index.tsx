@@ -6,7 +6,16 @@ import { SignalTicker } from '@/components/signal-ticker'
 import { useDownloadStore } from '@/store/download'
 import styles from './index.module.scss'
 
-const PLATFORMS = ['哔哩哔哩', 'YouTube', '抖音', '快手', '好看视频', 'TikTok', 'Vimeo', 'X · Twitter']
+const PLATFORMS = [
+  '哔哩哔哩',
+  'YouTube',
+  '抖音',
+  '快手',
+  '好看视频',
+  'TikTok',
+  'Vimeo',
+  'X · Twitter',
+]
 
 const FEATURES: { icon: LucideIcon; title: string; desc: string }[] = [
   { icon: Globe, title: '多平台解析', desc: '一站覆盖主流视频站点' },
@@ -51,7 +60,10 @@ const Dashboard = () => {
             <span className={`${styles.line} ${styles.reveal}`} style={reveal('240ms')}>
               你刷到的每一帧，
             </span>
-            <span className={`${styles.line} ${styles.titleAccent} ${styles.reveal}`} style={reveal('420ms')}>
+            <span
+              className={`${styles.line} ${styles.titleAccent} ${styles.reveal}`}
+              style={reveal('420ms')}
+            >
               都值得离线珍藏。
             </span>
           </h1>
@@ -61,12 +73,16 @@ const Dashboard = () => {
           </p>
 
           <p className={`${styles.sub} ${styles.reveal}`} style={reveal('720ms')}>
-            粘贴 Bilibili、YouTube、抖音、快手、好看视频、TikTok 等平台的视频链接，
+            粘贴 Bilibili、抖音、快手、好看视频、... 等平台的视频链接，
             <br className={styles.br} />
             一键解析，离线保存到本地设备。
           </p>
 
-          <form className={`${styles.input} ${styles.reveal}`} style={reveal('860ms')} onSubmit={handleSubmit}>
+          <form
+            className={`${styles.input} ${styles.reveal}`}
+            style={reveal('860ms')}
+            onSubmit={handleSubmit}
+          >
             <Link2 size={18} className={styles.inputIcon} />
             <input
               value={link}
