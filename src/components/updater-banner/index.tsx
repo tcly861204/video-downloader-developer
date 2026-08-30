@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { check, type Update } from '@tauri-apps/plugin-updater'
 import { relaunch } from '@tauri-apps/plugin-process'
-import { Download } from 'lucide-react'
 import styles from './index.module.scss'
 
 type BannerState =
@@ -60,22 +59,63 @@ const UpdaterBanner = () => {
   if (!visible) return null
 
   const update = updateRef.current
-  const headline =
-    state.kind === 'available' && update
-      ? `发现新版本 v${update.version}（当前 v${update.currentVersion}）`
+  const title =
+    state.kind === 'available'
+      ? '发现新版本，建议立即更新'
       : state.kind === 'downloading'
-        ? `正在下载更新… ${state.percent !== null ? `${state.percent}%` : ''}`
+        ? '正在下载更新'
         : state.kind === 'error'
-          ? `更新失败：${state.message}`
+          ? '更新失败'
           : ''
+  const sub =
+    state.kind === 'available'
+      ? '点击立即更新获取新功能与问题修复'
+      : state.kind === 'error'
+        ? state.message
+        : ''
 
   return (
     <aside className={styles.banner} role='status' aria-live='polite'>
-      <span className={styles.dial} aria-hidden>
-        <Download size={15} strokeWidth={1.8} />
+      <i className={`${styles.corner} ${styles.tl}`} aria-hidden />
+      <i className={`${styles.corner} ${styles.tr}`} aria-hidden />
+      <i className={`${styles.corner} ${styles.bl}`} aria-hidden />
+      <i className={`${styles.corner} ${styles.br}`} aria-hidden />
+
+      <span className={styles.signal} aria-hidden>
+        <span className={styles.dot} />
+        <span className={styles.meter}>
+          <i />
+          <i />
+          <i />
+          <i />
+        </span>
       </span>
-      <p className={styles.kicker}>// UPDATE</p>
-      <p className={styles.text}>{headline}</p>
+
+      <div className={styles.body}>
+        <div className={styles.topline}>
+          <span className={styles.kicker}>// FIRMWARE SIGNAL</span>
+          {update && state.kind !== 'error' && (
+            <span className={styles.verdiff}>
+              v{update.currentVersion}
+              <b>→</b>v{update.version}
+            </span>
+          )}
+        </div>
+        <p className={styles.title}>{title}</p>
+        {state.kind === 'downloading' ? (
+          <div className={styles.progressRow}>
+            <div className={styles.track}>
+              <div className={styles.fill} style={{ width: `${state.percent ?? 0}%` }} />
+            </div>
+            <span className={styles.percent}>
+              {state.percent !== null ? `${state.percent}%` : '--%'}
+            </span>
+          </div>
+        ) : (
+          sub && <p className={styles.sub}>{sub}</p>
+        )}
+      </div>
+
       <div className={styles.actions}>
         {state.kind === 'available' && (
           <>
@@ -89,7 +129,7 @@ const UpdaterBanner = () => {
         )}
         {state.kind === 'downloading' && (
           <button className={styles.ghost} disabled>
-            下载中…
+            下载中
           </button>
         )}
         {state.kind === 'error' && (
