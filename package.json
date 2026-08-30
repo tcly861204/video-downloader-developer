@@ -32,6 +32,7 @@
     "@unocss/preset-attributify": "^66.8.1",
     "@unocss/preset-icons": "^66.8.1",
     "@vitejs/plugin-react": "^4.7.0",
+    "sass-embedded": "^1.103.1",
     "typescript": "~5.8.3",
     "unocss": "^66.8.1",
     "vite": "^7.0.4"

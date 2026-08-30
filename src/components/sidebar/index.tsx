@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { House, LogIn, MonitorDown, Settings, type LucideIcon } from 'lucide-react'
+import styles from './index.module.scss'
 const NAV: {
   to: string
   key: string
@@ -15,8 +16,8 @@ const NAV: {
 ]
 export const Sidebar = () => {
   return (
-    <nav className='s-rail' aria-label='主导航'>
-      <ul className='s-rail-list'>
+    <nav className={styles.sidebar} aria-label='主导航'>
+      <ul className={styles.list}>
         {NAV.map((item) => {
           return (
             <li key={item.key}>
@@ -24,11 +25,11 @@ export const Sidebar = () => {
                 to={item.to}
                 end={item.end}
                 aria-label={item.label}
-                className={({ isActive }) => `s-rail-item${isActive ? ' is-active' : ''}`}
+                className={({ isActive }) => `${styles.item} ${isActive ? styles.active : ''}`}
               >
-                <i className='s-rail-ind' aria-hidden />
+                <i className={styles.ind} aria-hidden />
                 <item.icon size={17} strokeWidth={1.8} aria-hidden />
-                <span className='s-rail-tip'>{item.en}</span>
+                <span className={styles.tip}>{item.label}</span>
               </NavLink>
             </li>
           )

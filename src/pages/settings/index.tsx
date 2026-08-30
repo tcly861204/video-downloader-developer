@@ -14,7 +14,15 @@ function Row({ title, desc, children }: { title: string; desc?: string; children
   )
 }
 
-function Toggle({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+function Toggle({
+  on,
+  onChange,
+  label,
+}: {
+  on: boolean
+  onChange: (v: boolean) => void
+  label: string
+}) {
   return (
     <button
       type='button'
@@ -56,14 +64,36 @@ function Segmented<T extends string>({
   )
 }
 
-function Stepper({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void }) {
+function Stepper({
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  value: number
+  min: number
+  max: number
+  onChange: (v: number) => void
+}) {
   return (
     <div className='st-stepper'>
-      <button type='button' className='st-step-btn' disabled={value <= min} onClick={() => onChange(value - 1)} aria-label='减少'>
+      <button
+        type='button'
+        className='st-step-btn'
+        disabled={value <= min}
+        onClick={() => onChange(value - 1)}
+        aria-label='减少'
+      >
         <Minus size={13} />
       </button>
       <span className='st-step-val'>{value}</span>
-      <button type='button' className='st-step-btn' disabled={value >= max} onClick={() => onChange(value + 1)} aria-label='增加'>
+      <button
+        type='button'
+        className='st-step-btn'
+        disabled={value >= max}
+        onClick={() => onChange(value + 1)}
+        aria-label='增加'
+      >
         <Plus size={13} />
       </button>
     </div>
@@ -101,7 +131,10 @@ const Settings = () => {
           <p className='s-kicker st-kicker'>DOWNLOAD</p>
         </header>
         <div className='st-rows'>
-          <Row title='保存目录' desc={browseHint ? '目录选择对话框待接入 Tauri Dialog' : '视频文件默认存放位置'}>
+          <Row
+            title='保存目录'
+            desc={browseHint ? '目录选择对话框待接入 Tauri Dialog' : '视频文件默认存放位置'}
+          >
             <div className='st-dir'>
               <span className='st-path' title={s.saveDir}>
                 {s.saveDir}
@@ -113,7 +146,11 @@ const Settings = () => {
           </Row>
 
           <Row title='默认清晰度' desc='解析时优先选择的清晰度'>
-            <Segmented value={s.defaultQuality} options={QUALITY_OPTIONS} onChange={(v) => s.set({ defaultQuality: v })} />
+            <Segmented
+              value={s.defaultQuality}
+              options={QUALITY_OPTIONS}
+              onChange={(v) => s.set({ defaultQuality: v })}
+            />
           </Row>
 
           <Row title='并发下载数' desc='同时进行的下载任务数量'>
@@ -126,7 +163,11 @@ const Settings = () => {
           </Row>
 
           <Row title='文件名规则' desc='保存文件的命名格式'>
-            <Segmented value={s.filenameRule} options={RULE_OPTIONS} onChange={(v) => s.set({ filenameRule: v })} />
+            <Segmented
+              value={s.filenameRule}
+              options={RULE_OPTIONS}
+              onChange={(v) => s.set({ filenameRule: v })}
+            />
           </Row>
 
           <Row title='断点续传' desc='中断后可从上次进度继续下载'>
@@ -143,7 +184,11 @@ const Settings = () => {
         </header>
         <div className='st-rows'>
           <Row title='使用代理' desc='通过代理服务器访问视频站点'>
-            <Toggle on={s.proxyEnabled} onChange={(v) => s.set({ proxyEnabled: v })} label='使用代理' />
+            <Toggle
+              on={s.proxyEnabled}
+              onChange={(v) => s.set({ proxyEnabled: v })}
+              label='使用代理'
+            />
           </Row>
           <Row title='代理地址' desc='支持 HTTP / SOCKS5'>
             <div className='st-dir'>
@@ -179,10 +224,18 @@ const Settings = () => {
         </header>
         <div className='st-rows'>
           <Row title='下载完成通知' desc='任务完成后弹出系统通知'>
-            <Toggle on={s.notifyDone} onChange={(v) => s.set({ notifyDone: v })} label='下载完成通知' />
+            <Toggle
+              on={s.notifyDone}
+              onChange={(v) => s.set({ notifyDone: v })}
+              label='下载完成通知'
+            />
           </Row>
           <Row title='下载失败提醒' desc='任务失败时提醒你处理'>
-            <Toggle on={s.notifyFail} onChange={(v) => s.set({ notifyFail: v })} label='下载失败提醒' />
+            <Toggle
+              on={s.notifyFail}
+              onChange={(v) => s.set({ notifyFail: v })}
+              label='下载失败提醒'
+            />
           </Row>
         </div>
       </section>
@@ -203,7 +256,6 @@ const Settings = () => {
           <span className='st-about-meta'>V0.1.0 · SIGNAL OK · © 2026</span>
         </div>
       </section>
-
     </div>
   )
 }

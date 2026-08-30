@@ -1,14 +1,14 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { Header } from '@/components/header'
 import { Sidebar } from '@/components/sidebar'
+import { Background } from '@/components/background'
+import styles from './index.module.scss'
 const Layout = () => {
   const local = useLocation()
   return (
-    <section className='s-shell'>
+    <section className={styles.layout}>
       {/* ===== 共享背景层 ===== */}
-      <div className='s-bg-grid' aria-hidden />
-      <div className='s-bg-noise' aria-hidden />
-      <div className='s-vignette' aria-hidden />
+      <Background />
       {/* ===== 顶部导航 ===== */}
       <Header />
       {/* ===== 内容区 ===== */}

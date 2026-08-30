@@ -1,7 +1,12 @@
-import { useState, type CSSProperties, type ReactNode, type SubmitEvent as ReactSubmitEvent } from 'react'
+import {
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type SubmitEvent as ReactSubmitEvent,
+} from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, Lock, LogIn, User } from 'lucide-react'
-
+import { Background } from '@/components/background'
 const reveal = (d: string): CSSProperties => ({ '--d': d }) as CSSProperties
 
 function Field({
@@ -56,9 +61,7 @@ const Login = () => {
   return (
     <section className='lg-root p-3 pb-0'>
       {/* ===== 背景层 ===== */}
-      <div className='lg-bg-grid' aria-hidden />
-      <div className='lg-bg-noise' aria-hidden />
-      <div className='lg-vignette' aria-hidden />
+      <Background />
 
       {/* ===== 顶栏 ===== */}
       {/* <header className='lg-top'>

@@ -1,0 +1,94 @@
+.sidebar {
+  position: relative;
+  z-index: 3;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 50px;
+  border-right: 1px solid var(--line);
+  background: rgba(8, 12, 20, 0.55);
+  backdrop-filter: blur(10px);
+  .list {
+    flex: 1;
+    min-height: 0;
+    margin: 0;
+    padding: 8px 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    .item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 46px;
+      color: var(--muted);
+      text-decoration: none;
+      transition:
+        color 0.18s,
+        background 0.18s;
+      .tip {
+        position: absolute;
+        left: calc(100% + 10px);
+        top: 50%;
+        z-index: 10;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+        padding: 5px 10px;
+        border: 1px solid rgba(148, 163, 190, 0.22);
+        border-radius: 6px;
+        background: rgba(13, 18, 30, 0.92);
+        backdrop-filter: blur(8px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        font-family: var(--ff-mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        color: var(--amber);
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-6px, -50%);
+        transition:
+          opacity 0.16s,
+          transform 0.16s;
+      }
+      &:hover {
+        color: var(--text);
+        background: rgba(148, 163, 190, 0.06);
+        .tip {
+          opacity: 1;
+          transform: translate(0, -50%);
+        }
+      }
+      &:focus-visible {
+        outline: 2px solid var(--amber);
+        outline-offset: -2px;
+        .tip {
+          opacity: 1;
+          transform: translate(0, -50%);
+        }
+      }
+      .ind {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 2px;
+        height: 20px;
+        border-radius: 0 2px 2px 0;
+        background: var(--amber);
+        box-shadow: 0 0 10px rgba(255, 176, 58, 0.7);
+        transform: translateY(-50%) scaleY(0);
+        transform-origin: center;
+        transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      &.active {
+        color: var(--amber);
+        background: rgba(255, 176, 58, 0.05);
+        .ind {
+          transform: translateY(-50%) scaleY(1);
+        }
+      }
+    }
+  }
+}

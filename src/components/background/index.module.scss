@@ -1,0 +1,25 @@
+.grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(148, 163, 190, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 190, 0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask: radial-gradient(120% 100% at 50% 0%, #000 30%, transparent 78%);
+  mask: radial-gradient(120% 100% at 50% 0%, #000 30%, transparent 78%);
+}
+.noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(130% 110% at 50% 42%, transparent 55%, rgba(0, 0, 0, 0.45) 100%);
+}
