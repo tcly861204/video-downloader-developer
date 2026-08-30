@@ -1,0 +1,130 @@
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  padding-bottom: 4px;
+}
+
+.summarySep {
+  width: 1px;
+  height: 12px;
+  background: rgba(148, 163, 190, 0.3);
+  margin: 0 4px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 18px 0 14px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(8, 12, 20, 0.4);
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    color 0.18s,
+    background 0.18s;
+
+  &:hover {
+    color: var(--text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+  }
+}
+
+.tabCount {
+  min-width: 18px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  background: rgba(148, 163, 190, 0.12);
+  color: var(--faint);
+}
+
+.tabActive {
+  background: rgba(255, 176, 58, 0.12);
+  color: var(--amber);
+
+  .tabCount {
+    background: rgba(255, 176, 58, 0.18);
+    color: var(--amber);
+  }
+}
+
+.batch {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 0;
+  color: var(--faint);
+
+  p {
+    margin: 0;
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+  }
+}
+
+@media (max-width: 640px) {
+  .summary {
+    display: none;
+  }
+}
