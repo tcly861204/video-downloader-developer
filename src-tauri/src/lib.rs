@@ -3,6 +3,7 @@ mod config;
 mod download;
 mod http;
 mod platforms;
+mod tray;
 
 use commands::{cancel_download, get_default_dir, get_settings, parse_video, save_settings, start_download, DownloadState};
 
@@ -13,6 +14,11 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         // 保存每个下载任务的暂停标志
         .manage(DownloadState::default())
+        .setup(|app| {
+            // 系统托盘：左键唤起主窗口 / 菜单显示、退出
+            tray::init(app.handle())?;
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             get_settings,
             save_settings,

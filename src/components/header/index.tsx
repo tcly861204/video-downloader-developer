@@ -1,6 +1,7 @@
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { RadioTower, Minus, Maximize, Minimize, X } from 'lucide-react'
+import { Minus, Maximize, Minimize, X } from 'lucide-react'
 import { useLayoutEffect, useState } from 'react'
+import logo from '@/assets/logo.png'
 import styles from './index.module.scss'
 export const Header = () => {
   const [isMaximi, setIsMaximi] = useState<boolean>(false)
@@ -22,9 +23,7 @@ export const Header = () => {
   return (
     <header className={styles.header} onMouseDown={startDrag}>
       <div className={styles.brand}>
-        <span className={styles.logo}>
-          <RadioTower size={16} strokeWidth={2.2} />
-        </span>
+        <img src={logo} className={styles.logo} alt='' draggable={false} />
         <span className={styles.text}>
           <b>拾帧</b>
           <i>FRAMECATCH</i>
