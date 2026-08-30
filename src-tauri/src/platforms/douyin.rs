@@ -189,6 +189,7 @@ fn detail_to_info(id: &str, detail: &Value) -> Result<VideoInfo, String> {
         duration_ms,
         cover,
         play_url,
+        platform: "抖音".to_string(),
     })
 }
 
@@ -328,6 +329,7 @@ fn parse_from_html(id: &str, html: &str) -> Result<VideoInfo, String> {
             duration_ms: 0,
             cover: String::new(),
             play_url,
+            platform: "抖音".to_string(),
         });
     }
 

@@ -164,7 +164,7 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
     const task: DownloadTask = {
       id: nanoid(),
       title: info.title || '抖音视频',
-      platform: '抖音',
+      platform: info.platform || '抖音',
       quality: qualityLabel(settings.defaultQuality),
       size: 0,
       downloaded: 0,

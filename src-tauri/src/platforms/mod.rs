@@ -1,10 +1,11 @@
 //! 平台解析统一入口
 //!
-//! 按平台分目录存放各自解析实现（当前仅抖音）。
+//! 按平台分目录存放各自解析实现（抖音 / 快手）。
 //! 对外提供 `parse(text, proxy)`：先识别平台，再调用对应实现；
-//! 以后新增平台（快手 / 视频号等）只需加一个 `pub mod xxx` 并在下方分发即可。
+//! 以后新增平台只需加一个 `pub mod xxx` 并在下方分发即可。
 
 pub mod douyin;
+pub mod kuaishou;
 
 use serde::Serialize;
 
@@ -21,6 +22,8 @@ pub struct VideoInfo {
     pub duration_ms: u64,
     pub cover: String,
     pub play_url: String,
+    /// 平台中文标签（如 抖音 / 快手），供任务行展示与文件名规则使用
+    pub platform: String,
 }
 
 /// 主页作品列表中的一条
@@ -51,10 +54,14 @@ pub struct PostListResult {
 
 /// 解析分享文本/链接，返回视频信息；`proxy` 来自设置，透传给各平台。
 pub async fn parse(text: &str, proxy: &ProxyCfg) -> Result<VideoInfo, String> {
-    if !douyin::can_handle(text) {
-        return Err("未识别的链接，目前仅支持抖音分享链接".into());
+    let client = http_client(proxy)?;
+
+    if douyin::can_handle(text) {
+        return douyin::parse(&client, proxy, text).await;
+    }
+    if kuaishou::can_handle(text) {
+        return kuaishou::parse(&client, text).await;
     }
 
-    let client = http_client(proxy)?;
-    douyin::parse(&client, proxy, text).await
+    Err("未识别的链接，目前仅支持抖音和快手分享链接".into())
 }

@@ -16,6 +16,8 @@ export interface VideoInfo {
   durationMs: number
   cover: string
   playUrl: string
+  /** 平台中文标签（如 抖音 / 快手） */
+  platform: string
 }
 
 /** 下载进度事件负载 */
