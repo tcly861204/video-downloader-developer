@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { open } from '@tauri-apps/plugin-dialog'
 import { useSettingsStore, type FilenameRule, type Quality } from '@/store/settings'
 import { Segmented } from '@/components/segmented'
 import { SettingRow } from '@/components/setting-row'
@@ -21,7 +21,15 @@ const RULE_OPTIONS: { value: FilenameRule; label: string }[] = [
 
 const Settings = () => {
   const s = useSettingsStore()
-  const [browseHint, setBrowseHint] = useState(false)
+
+  const pickDir = async () => {
+    try {
+      const dir = await open({ directory: true, multiple: false })
+      if (dir) s.set({ saveDir: dir })
+    } catch {
+      /* 用户取消或非 Tauri 环境，保持原值 */
+    }
+  }
 
   return (
     <section className={`s-page ${styles.page}`}>
@@ -36,15 +44,12 @@ const Settings = () => {
           <p className={`s-kicker ${styles.kicker}`}>DOWNLOAD</p>
         </header>
         <div className={styles.rows}>
-          <SettingRow
-            title='保存目录'
-            desc={browseHint ? '目录选择对话框待接入 Tauri Dialog' : '视频文件默认存放位置'}
-          >
+          <SettingRow title='保存目录' desc='视频文件默认存放位置'>
             <div className={styles.dir}>
               <span className={styles.path} title={s.saveDir}>
                 {s.saveDir}
               </span>
-              <button className='s-btn s-btn--ghost' onClick={() => setBrowseHint(true)}>
+              <button className='s-btn s-btn--ghost' onClick={pickDir}>
                 浏览
               </button>
             </div>

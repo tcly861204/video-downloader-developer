@@ -96,6 +96,7 @@
 .addActions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: end;
   gap: 10px;
 }
 
