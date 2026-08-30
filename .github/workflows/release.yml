@@ -50,7 +50,7 @@ jobs:
           workspaces: './src-tauri -> target'
 
       - name: 安装前端依赖
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: 校验版本与 tag 一致
         shell: pwsh
