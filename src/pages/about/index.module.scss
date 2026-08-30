@@ -1,0 +1,405 @@
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(148, 163, 190, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(148, 163, 190, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(148, 163, 190, 0);
+  }
+}
+
+@keyframes sweep {
+  0% {
+    left: -48px;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.4vh, 26px);
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* ---------- 页头 ---------- */
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+
+  h1 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.titleAccent {
+  color: var(--amber);
+  text-shadow: 0 0 30px rgba(255, 176, 58, 0.32);
+}
+
+.titleDim {
+  color: var(--muted);
+}
+
+.sub {
+  max-width: min(680px, 100%);
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+/* ---------- 分节标题 ---------- */
+
+.block {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.blockHead {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.blockTitle {
+  margin: 0;
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: var(--muted);
+}
+
+/* ---------- 信号网格 ---------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scanGrid {
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+}
+
+/* ---------- 平台卡 ---------- */
+
+.card {
+  --c: var(--amber);
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  overflow: hidden;
+  transition:
+    border-color 0.25s,
+    background 0.25s,
+    transform 0.25s,
+    opacity 0.25s;
+
+  /* 顶部一道品牌色细线 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--c), transparent);
+    opacity: 0.75;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--c);
+    background: rgba(18, 24, 38, 0.8);
+  }
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ch {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--faint);
+}
+
+.lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--amber);
+
+  i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px rgba(255, 176, 58, 0.7);
+    animation: pulse 1.9s ease-in-out infinite;
+  }
+}
+
+.scanTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+
+  i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: ping 2.2s ease-out infinite;
+  }
+}
+
+.cardBody {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.dial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--c) 9%, transparent);
+  color: var(--c);
+}
+
+.id {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--ff-serif);
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.en {
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--c);
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+.bar {
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--c), transparent);
+  opacity: 0.8;
+}
+
+.desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.caps {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+    color: var(--faint);
+  }
+}
+
+/* ---------- 扫描中卡片 ---------- */
+
+.scanCard {
+  border-style: dashed;
+  opacity: 0.66;
+  filter: saturate(0.55);
+
+  /* 横向扫描扫光 */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -48px;
+    width: 48px;
+    background: linear-gradient(90deg, transparent, rgba(148, 163, 190, 0.16), transparent);
+    animation: sweep 2.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  &:hover {
+    opacity: 0.92;
+    filter: saturate(0.8);
+  }
+}
+
+/* ---------- 底部状态 ---------- */
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 0 2px;
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--faint);
+}
+
+/* ---------- 入场 ---------- */
+
+[data-reveal] {
+  opacity: 0;
+  animation: rise 0.65s cubic-bezier(0.22, 0.9, 0.28, 1) var(--d, 0ms) both;
+}
+
+.grid > li,
+.scanGrid > li {
+  --d: 60ms;
+  &:nth-child(1) {
+    --d: 90ms;
+  }
+  &:nth-child(2) {
+    --d: 150ms;
+  }
+  &:nth-child(3) {
+    --d: 210ms;
+  }
+  &:nth-child(4) {
+    --d: 270ms;
+  }
+  &:nth-child(5) {
+    --d: 330ms;
+  }
+  &:nth-child(6) {
+    --d: 390ms;
+  }
+  &:nth-child(7) {
+    --d: 450ms;
+  }
+  &:nth-child(8) {
+    --d: 510ms;
+  }
+}
+
+/* ---------- 窄窗口适配 ---------- */
+
+@media (max-width: 640px) {
+  .grid,
+  .scanGrid {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 12px;
+  }
+}
+
+@media (max-height: 720px) {
+  .page {
+    gap: 14px;
+  }
+  .card {
+    gap: 8px;
+  }
+}
+
+/* ---------- 减少动效 ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    animation: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+  .card {
+    transition: none;
+  }
+  .lock i,
+  .scanTag i,
+  .scanCard::after {
+    animation: none !important;
+  }
+  .scanCard::after {
+    display: none;
+  }
+}

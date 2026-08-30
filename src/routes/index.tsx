@@ -7,6 +7,7 @@ import NProgress from 'nprogress'
 const Dashboard = lazy(() => import('@/pages/dashboard'))
 const Downloads = lazy(() => import('@/pages/downloads'))
 const Settings = lazy(() => import('@/pages/settings'))
+const About = lazy(() => import('@/pages/about'))
 const Login = lazy(() => import('@/pages/login'))
 NProgress.configure({ showSpinner: false })
 const AuthLayout = () => (
@@ -34,6 +35,10 @@ const routes: RouteObject[] = [
       {
         path: 'settings',
         element: <Page component={Settings} />,
+      },
+      {
+        path: 'about',
+        element: <Page component={About} />,
       },
     ],
   },
