@@ -1,0 +1,77 @@
+.wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  max-width: 100%;
+  border-top: 1px solid var(--line);
+  padding: 14px 0 20px;
+
+  .label {
+    flex: none;
+    font-family: var(--ff-mono);
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    color: var(--amber);
+  }
+
+  .ticker {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    -webkit-mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    mask: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  .track {
+    display: flex;
+    width: max-content;
+    animation: tick 30s linear infinite;
+  }
+
+  .item {
+    display: flex;
+  }
+
+  .text {
+    display: flex;
+    align-items: center;
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    white-space: nowrap;
+    color: var(--faint);
+
+    b {
+      margin: 0 14px;
+      font-weight: 400;
+      color: rgba(255, 176, 58, 0.8);
+    }
+  }
+}
+
+@keyframes tick {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-height: 750px) {
+  .wrap {
+    padding: 10px 0 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none !important;
+  }
+}

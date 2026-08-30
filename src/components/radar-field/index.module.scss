@@ -1,0 +1,95 @@
+.field {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: min(60vmin, 560px);
+  aspect-ratio: 1;
+  pointer-events: none;
+  opacity: 0.45;
+  -webkit-mask: radial-gradient(circle at 50% 50%, #000 55%, transparent 92%);
+  mask: radial-gradient(circle at 50% 50%, #000 55%, transparent 92%);
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 12px 2px rgba(255, 176, 58, 0.5);
+  }
+
+  .rings {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: repeating-radial-gradient(
+      circle at 50% 50%,
+      transparent 0 calc(20% - 1px),
+      rgba(148, 163, 190, 0.1) calc(20% - 1px) 20%
+    );
+  }
+
+  .sweep {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(255, 176, 58, 0.28), rgba(255, 176, 58, 0) 75deg);
+    animation: sweep 7s linear infinite;
+  }
+
+  .stars {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--muted);
+    color: var(--muted);
+    box-shadow: 0 0 6px currentColor;
+    opacity: 0.1;
+    animation: twinkle var(--dur, 3s) ease-in-out var(--d, 0s) infinite;
+  }
+
+  .starAmber {
+    background: var(--amber);
+    color: var(--amber);
+    box-shadow: 0 0 8px rgba(255, 176, 58, 0.8);
+  }
+}
+
+@keyframes sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.08;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sweep,
+  .star {
+    animation: none !important;
+  }
+}
