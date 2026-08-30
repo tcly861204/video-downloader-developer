@@ -26,3 +26,5 @@ github.key
 *.njsproj
 *.sln
 *.sw?
+
+/framecatch

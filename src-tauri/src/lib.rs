@@ -1,3 +1,4 @@
+mod analytics;
 mod commands;
 mod config;
 mod download;
@@ -23,6 +24,8 @@ pub fn run() {
         .setup(|app| {
             // 系统托盘：左键唤起主窗口 / 菜单显示、退出
             tray::init(app.handle())?;
+            // 启动埋点：调试构建内部会跳过，仅发布版上报
+            analytics::report_launch(app.handle());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

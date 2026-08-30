@@ -113,8 +113,9 @@ jobs:
           cp ../latest.json ./latest.json
           cp ../LICENSE.md ./LICENSE.md
           cp ../README.md ./README.md
-          git add latest.json LICENSE.md README.md
-          git commit -m "chore: update latest.json + LICENSE + README for ${{ github.ref_name }}" || echo "no changes"
+          cp ../screen.png ./screen.png
+          git add latest.json LICENSE.md README.md screen.png
+          git commit -m "chore: update latest.json + LICENSE + README + screen.png for ${{ github.ref_name }}" || echo "no changes"
           git push origin HEAD:main
 
       - name: 发布到公开仓库 Releases

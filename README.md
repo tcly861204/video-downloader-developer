@@ -10,8 +10,14 @@
 
 ## 下载
 
+![Downloads](https://img.shields.io/github/downloads/tcly861204/framecatch/total)
+
 - 前往 **[Releases](../../releases/latest)** 下载最新安装包
 - 应用内置自动更新，联网启动时会自动检测新版本
+
+## 界面预览
+
+![FRAMECATCH 界面](screen.png)
 
 ## 支持的平台
 
