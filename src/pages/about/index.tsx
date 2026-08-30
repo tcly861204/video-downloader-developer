@@ -73,7 +73,7 @@ const About = () => {
     <section className={`s-page ${styles.page}`}>
       {/* ===== 页头 ===== */}
       <div className={styles.about}>
-        <span className={styles.aboutName}>拾帧 · FRAMECATCH</span>
+        <span className={styles.aboutName}>FRAMECATCH</span>
         <span className={styles.aboutEn}>MULTI-PLATFORM VIDEO DOWNLOADER</span>
         <p className={styles.aboutDesc}>
           把全网的视频收进你的设备。支持 Bilibili、YouTube、抖音、快手、好看视频、TikTok

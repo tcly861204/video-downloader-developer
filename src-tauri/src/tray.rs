@@ -27,7 +27,7 @@ pub fn init(app: &AppHandle) -> tauri::Result<()> {
     let menu = Menu::with_items(app, &[&show, &separator, &quit])?;
 
     let mut builder = TrayIconBuilder::with_id("main-tray")
-        .tooltip("拾帧 · FRAMECATCH")
+        .tooltip("FRAMECATCH")
         .menu(&menu);
 
     // 复用应用图标（src-tauri/icons 里的品牌 logo）作为托盘图标

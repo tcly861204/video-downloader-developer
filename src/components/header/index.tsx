@@ -25,8 +25,8 @@ export const Header = () => {
       <div className={styles.brand}>
         <img src={logo} className={styles.logo} alt='' draggable={false} />
         <span className={styles.text}>
-          <b>拾帧</b>
-          <i>FRAMECATCH</i>
+          <b>FRAMECATCH</b>
+          <i>VIDEO DOWNLOADER</i>
         </span>
       </div>
       <div className={styles.navside} onMouseDown={(e) => e.stopPropagation()}>

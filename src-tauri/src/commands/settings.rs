@@ -3,9 +3,9 @@ use std::path::PathBuf;
 use tauri::{AppHandle, Manager};
 
 /// 配置文件路径：系统用户配置目录下的 settings.json。
-/// Windows: %APPDATA%\com.administrator.video_downloader\
-/// macOS:   ~/Library/Application Support/com.administrator.video_downloader/
-/// Linux:   ~/.config/com.administrator.video_downloader/
+/// Windows: %APPDATA%\com.administrator.framecatch\
+/// macOS:   ~/Library/Application Support/com.administrator.framecatch/
+/// Linux:   ~/.config/com.administrator.framecatch/
 fn config_path(app: &AppHandle) -> Result<PathBuf, String> {
     let dir = app
         .path()

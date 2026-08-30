@@ -1,7 +1,7 @@
 # 自动发布：打 tag（v*）后构建 Windows NSIS 安装包并发布到公开产物仓库。
 #
 # 私有源码仓库：tcly861204/video-downloader-developer（本 workflow 在这里跑）
-# 公开产物仓库：tcly861204/video-downloader（只放安装包 + latest.json，零源码）
+# 公开产物仓库：tcly861204/framecatch（只放安装包 + latest.json，零源码）
 #
 # 使用前需在私有源码仓库配置两个 secrets：
 #   - TAURI_SIGNING_PRIVATE_KEY         签名私钥（.keys/framecatch.key 的文件内容）
@@ -26,7 +26,7 @@ jobs:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
       # 公开产物仓库，与 tauri.conf.json 的 updater.endpoints 保持一致
-      RELEASES_REPO: tcly861204/video-downloader
+      RELEASES_REPO: tcly861204/framecatch
     steps:
       - name: 检出源码
         uses: actions/checkout@v5
@@ -103,7 +103,7 @@ jobs:
         env:
           TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          # 先推送：公开仓库首次为空时，这一步会创建首个 commit + main 分支，
+          # 首次推送：公开仓库为空时，这一步会创建首个 commit + main 分支，
           # 否则 Releases API 会拒绝在空仓库上建 release（HTTP 422 Repository is empty）。
           # 用显式 refspec 推 main：clone 空仓库后本地分支没有 upstream，直接 git push 会报 no upstream
           git clone "https://x-access-token:${TOKEN}@github.com/${RELEASES_REPO}.git" updater-repo

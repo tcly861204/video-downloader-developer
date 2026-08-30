@@ -335,7 +335,7 @@ pub async fn run(
         let _ = app
             .notification()
             .builder()
-            .title("拾帧 · 下载完成")
+            .title("FRAMECATCH · 下载完成")
             .body(body)
             .show();
     }

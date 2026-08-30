@@ -1,7 +1,7 @@
 import styles from './index.module.scss'
 
 const STATUS_LINES: [string, string][] = [
-  ['STATION', '拾帧 · FRAMECATCH'],
+  ['STATION', 'FRAMECATCH'],
   ['UPLINK', 'REQUIRED'],
   ['CIPHER', 'AES-256'],
   ['CHANNEL', 'PRIVATE'],
