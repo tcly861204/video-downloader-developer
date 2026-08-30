@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Clapperboard, Pause, Play, RotateCw, Trash2 } from 'lucide-react'
+import { Clapperboard, Pause, Play, RotateCw, Sparkles, Trash2 } from 'lucide-react'
 import { useDownloadStore, type TaskStatus } from '@/store/download'
 import { formatBytes } from '@/utils/format'
 import { parseUrl } from '@/utils/parse'
 import { TaskRow } from '@/components/task-row'
+import { Segmented } from '@/components/segmented'
 import styles from './index.module.scss'
 
 type Tab = 'all' | 'active' | 'done' | 'failed'
+type Mode = 'single' | 'batch'
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'all', label: '全部' },
@@ -21,6 +23,8 @@ const Downloads = () => {
   const tasks = useDownloadStore((s) => s.tasks)
   const actions = useDownloadStore.getState()
   const [tab, setTab] = useState<Tab>('all')
+  const [mode, setMode] = useState<Mode>('single')
+  const [link, setLink] = useState('')
 
   useEffect(() => {
     const store = useDownloadStore.getState()
@@ -59,15 +63,66 @@ const Downloads = () => {
           <p className='s-kicker'>// DOWNLOAD QUEUE</p>
           <h1 className='s-title'>下载中心</h1>
         </div>
-        <div className={styles.summary}>
-          <span className='s-dot s-dot--amber' aria-hidden />
-          <span>进行中 {activeCount}</span>
-          <span className='s-dot s-dot--ok' aria-hidden />
-          <span>已完成 {counts.done}</span>
-          <span className={styles.summarySep} aria-hidden />
-          <span>累计 {formatBytes(totalBytes)}</span>
+        <div className={styles.headRight}>
+          <div className={styles.summary}>
+            <span className='s-dot s-dot--amber' aria-hidden />
+            <span>进行中 {activeCount}</span>
+            <span className='s-dot s-dot--ok' aria-hidden />
+            <span>已完成 {counts.done}</span>
+            <span className={styles.summarySep} aria-hidden />
+            <span>累计 {formatBytes(totalBytes)}</span>
+          </div>
+          <Segmented
+            value={mode}
+            onChange={setMode}
+            options={[
+              { value: 'single', label: '单个下载' },
+              { value: 'batch', label: '批量下载' },
+            ]}
+          />
         </div>
       </header>
+
+      {/* ===== 粘贴链接 ===== */}
+      <section className={`s-panel ${styles.addBox}`}>
+        <div className={styles.addHead}>
+          <p className='s-kicker'>{mode === 'single' ? '// ADD NEW TASK' : '// BATCH TASKS'}</p>
+          <div className={styles.chips}>
+            {mode === 'single' ? (
+              <>
+                <span className='s-tag'>抖音</span>
+                <span className='s-tag'>快手</span>
+                <span className='s-tag'>哔哩哔哩</span>
+                <span className='s-tag'>YouTube</span>
+              </>
+            ) : (
+              <>
+                <span className='s-tag'>主页链接</span>
+                <span className='s-tag'>分页加载</span>
+              </>
+            )}
+          </div>
+        </div>
+        <textarea
+          className={styles.addInput}
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          placeholder={
+            mode === 'single'
+              ? '粘贴分享文本或链接，例如：\n抖音：7.94 复制打开抖音… https://v.douyin.com/xxxx/\n快手：复制打开快手… https://v.kuaishou.com/xxxx/'
+              : '粘贴用户主页链接，例如：\nhttps://www.douyin.com/user/MS4wLjABAAAA…'
+          }
+          rows={3}
+          spellCheck={false}
+          aria-label='粘贴视频链接'
+        />
+        <div className={styles.addActions}>
+          <button className='s-btn s-btn--primary' disabled={!link.trim()}>
+            <Sparkles size={14} />
+            {mode === 'single' ? '解析并加入队列' : '解析主页作品'}
+          </button>
+        </div>
+      </section>
 
       {/* ===== 筛选 + 工具栏 ===== */}
       <div className={styles.toolbar}>

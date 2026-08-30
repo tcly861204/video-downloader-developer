@@ -11,6 +11,7 @@
   flex-wrap: wrap;
   padding-bottom: 18px;
   border-bottom: 1px solid var(--line);
+  margin-bottom: 15px;
 }
 
 .summary {
@@ -21,7 +22,6 @@
   font-size: 11px;
   letter-spacing: 0.08em;
   color: var(--muted);
-  padding-bottom: 4px;
 }
 
 .summarySep {
@@ -29,6 +29,74 @@
   height: 12px;
   background: rgba(148, 163, 190, 0.3);
   margin: 0 4px;
+}
+
+.headRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* ---------- 粘贴链接面板 ---------- */
+.addBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.addHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.addInput {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 62px;
+  resize: none;
+  padding: 11px 14px;
+  border: 1px solid rgba(148, 163, 190, 0.22);
+  border-radius: 10px;
+  background: rgba(12, 17, 27, 0.72);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  outline: none;
+  user-select: text;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
+
+  &::placeholder {
+    color: var(--faint);
+  }
+
+  &:focus {
+    border-color: rgba(255, 176, 58, 0.55);
+    box-shadow:
+      0 0 0 4px rgba(255, 176, 58, 0.1),
+      0 0 30px rgba(255, 176, 58, 0.12);
+    background: rgba(10, 15, 25, 0.9);
+  }
+}
+
+.addActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .toolbar {
