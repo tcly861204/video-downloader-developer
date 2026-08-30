@@ -196,6 +196,14 @@
   flex-wrap: wrap;
 }
 
+.batchActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
 .list {
   display: flex;
   flex-direction: column;

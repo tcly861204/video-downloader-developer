@@ -20,6 +20,7 @@ import {
   type DownloadDone,
   type DownloadError,
   type DownloadProgress,
+  type PostItem,
 } from '@/api/video'
 import { qualityLabel, useSettingsStore } from '@/store/settings'
 
@@ -39,7 +40,8 @@ export interface DownloadTask {
   status: TaskStatus
   createdAt: number
   awemeId: string
-  playUrl: string
+  /** 播放地址；批量任务由后端按 awemeId 解析，创建时可为空 */
+  playUrl?: string
   /** 视频封面图 URL，解析时带回，任务行缩略图使用 */
   cover?: string
   /**
@@ -59,6 +61,8 @@ interface DownloadState {
   setPendingUrl: (url: string | null) => void
   /** 解析链接并入队（不自动下载）；失败时抛出给页面显示 */
   parseAndAdd: (text: string) => Promise<void>
+  /** 批量入队：把主页作品创建为已请求的下载任务，返回任务 id 列表 */
+  enqueueBatch: (posts: PostItem[]) => string[]
   start: (id: string) => Promise<void>
   pause: (id: string) => Promise<void>
   resume: (id: string) => Promise<void>
@@ -176,6 +180,32 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
     set((s) => ({ tasks: [task, ...s.tasks] }))
   },
 
+  // 批量入队：主页作品 → 下载任务（queued + requested）。
+  // 不自动开始，由页面逐条调用 start(id)；并发槽位不足时由 kickArmed 排队接力。
+  enqueueBatch: (posts) => {
+    const settings = useSettingsStore.getState()
+    const quality = qualityLabel(settings.defaultQuality)
+    const created = posts.map((p): DownloadTask => {
+      const id = nanoid()
+      return {
+        id,
+        title: p.desc || '抖音视频',
+        platform: '抖音',
+        quality,
+        size: 0,
+        downloaded: 0,
+        speed: 0,
+        status: 'queued',
+        createdAt: Date.now(),
+        awemeId: p.awemeId,
+        cover: p.cover || undefined,
+        requested: true,
+      }
+    })
+    set((s) => ({ tasks: [...created, ...s.tasks] }))
+    return created.map((t) => t.id)
+  },
+
   start: async (id) => {
     const task = get().tasks.find((t) => t.id === id)
     if (!task || task.status === 'downloading') return
@@ -201,7 +231,7 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
     try {
       await startDownload({
         taskId: id,
-        playUrl: task.playUrl,
+        playUrl: task.playUrl ?? '',
         title: task.title,
         awemeId: task.awemeId,
         platform: task.platform,

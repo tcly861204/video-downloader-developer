@@ -23,6 +23,32 @@ pub struct VideoInfo {
     pub play_url: String,
 }
 
+/// 主页作品列表中的一条
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PostItem {
+    pub aweme_id: String,
+    pub desc: String,
+    pub author: String,
+    pub duration_ms: u64,
+    pub cover: String,
+    pub create_time: u64,
+    pub digg_count: u64,
+    pub comment_count: u64,
+    pub share_count: u64,
+    pub collect_count: u64,
+    pub play_count: u64,
+}
+
+/// 主页作品列表（分页）
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct PostListResult {
+    pub items: Vec<PostItem>,
+    pub has_more: bool,
+    pub max_cursor: u64,
+}
+
 /// 解析分享文本/链接，返回视频信息；`proxy` 来自设置，透传给各平台。
 pub async fn parse(text: &str, proxy: &ProxyCfg) -> Result<VideoInfo, String> {
     if !douyin::can_handle(text) {

@@ -5,7 +5,10 @@ mod http;
 mod platforms;
 mod tray;
 
-use commands::{cancel_download, get_default_dir, get_settings, parse_video, save_settings, start_download, DownloadState};
+use commands::{
+    cancel_download, fetch_user_posts, get_default_dir, get_settings, parse_video, save_settings,
+    start_download, DownloadState,
+};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -25,7 +28,8 @@ pub fn run() {
             parse_video,
             start_download,
             cancel_download,
-            get_default_dir
+            get_default_dir,
+            fetch_user_posts
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

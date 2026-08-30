@@ -1,0 +1,146 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+
+  &:hover {
+    border-color: rgba(255, 176, 58, 0.3);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
+  }
+}
+
+.cardSel {
+  border-color: rgba(255, 176, 58, 0.6);
+  box-shadow:
+    0 0 0 1px rgba(255, 176, 58, 0.35),
+    0 6px 18px rgba(255, 176, 58, 0.08);
+}
+
+.thumb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4;
+  background: rgba(10, 14, 22, 0.6);
+  color: var(--faint);
+
+  img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.dur {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  z-index: 1;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  font-style: normal;
+  letter-spacing: 0.05em;
+  background: rgba(6, 9, 15, 0.72);
+  color: #e9edf4;
+}
+
+/* 取景框角标：左上角 L 形刻度 */
+.ring {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 12px;
+  height: 12px;
+  border-top: 1.5px solid rgba(233, 237, 244, 0.55);
+  border-left: 1.5px solid rgba(233, 237, 244, 0.55);
+  border-top-left-radius: 4px;
+  z-index: 1;
+}
+
+.tick {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--amber-2), var(--amber));
+  color: #1a1208;
+  box-shadow: 0 2px 10px rgba(255, 176, 58, 0.5);
+}
+
+.title {
+  margin: 0;
+  padding: 0 10px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text);
+  min-height: 2.9em;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px 10px;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  color: var(--faint);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+}

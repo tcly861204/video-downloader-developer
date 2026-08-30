@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Clapperboard, Pause, Play, RotateCw, Sparkles, Trash2 } from 'lucide-react'
+import { Clapperboard, Download, Pause, Play, RotateCw, Sparkles, Trash2 } from 'lucide-react'
 import { revealItemInDir } from '@tauri-apps/plugin-opener'
 import { useDownloadStore, type TaskStatus } from '@/store/download'
 import { formatBytes } from '@/utils/format'
 import { TaskRow } from '@/components/task-row'
 import { Segmented } from '@/components/segmented'
+import { PostGrid } from '@/components/post-grid'
+import { useProfileBatch } from '@/hooks/use-profile-batch'
 import styles from './index.module.scss'
 
 type Tab = 'all' | 'active' | 'done' | 'failed'
@@ -27,6 +29,8 @@ const Downloads = () => {
   const [link, setLink] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  // 批量模式：主页解析 / 勾选 / 入队，错误统一上抛到本页横幅
+  const batch = useProfileBatch(setError)
 
   // 消费首页写入的待解析链接
   useEffect(() => {
@@ -56,9 +60,9 @@ const Downloads = () => {
     }
   }
 
-  // 批量模式暂未开放
-  const handleBatchHint = () => {
-    setError('批量主页下载开发中，敬请期待 —— 当前支持粘贴抖音单个视频分享链接')
+  // 批量模式：解析主页链接 → 作品网格
+  const handleParseProfile = async () => {
+    if (await batch.parseProfile(link)) setLink('')
   }
 
   // 打开已完成任务所在文件夹
@@ -148,11 +152,11 @@ const Downloads = () => {
         <div className={styles.addActions}>
           <button
             className='s-btn s-btn--primary'
-            disabled={!link.trim() || busy}
-            onClick={mode === 'single' ? handleParse : handleBatchHint}
+            disabled={!link.trim() || busy || batch.parsing}
+            onClick={mode === 'single' ? handleParse : handleParseProfile}
           >
             <Sparkles size={14} />
-            {busy
+            {busy || batch.parsing
               ? '解析中…'
               : mode === 'single'
                 ? '解析并加入队列'
@@ -167,6 +171,33 @@ const Downloads = () => {
           <span className='s-kicker'>// ERROR</span>
           <p className={styles.errorText}>{error}</p>
         </div>
+      )}
+
+      {/* ===== 批量模式：作品网格 ===== */}
+      {mode === 'batch' && batch.posts.length > 0 && (
+        <>
+          <div className={styles.batchActions}>
+            <button
+              className='s-btn s-btn--primary'
+              onClick={batch.downloadSelected}
+              disabled={batch.selected.size === 0}
+            >
+              <Download size={14} />
+              下载选中 ({batch.selected.size})
+            </button>
+            {batch.hasMore && (
+              <button className='s-btn' onClick={batch.loadMore} disabled={batch.parsing}>
+                {batch.parsing ? '加载中…' : '加载更多'}
+              </button>
+            )}
+          </div>
+          <PostGrid
+            posts={batch.posts}
+            selected={batch.selected}
+            onToggle={batch.toggleSelect}
+            onToggleAll={batch.toggleSelectAll}
+          />
+        </>
       )}
 
       {/* ===== 筛选 + 工具栏 ===== */}

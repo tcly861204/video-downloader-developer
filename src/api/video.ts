@@ -37,10 +37,32 @@ export interface DownloadError {
   error: string
 }
 
-/** 启动下载所需参数 */
+/** 主页作品列表中的一条 */
+export interface PostItem {
+  awemeId: string
+  desc: string
+  author: string
+  durationMs: number
+  cover: string
+  createTime: number
+  diggCount: number
+  commentCount: number
+  shareCount: number
+  collectCount: number
+  playCount: number
+}
+
+/** 主页作品列表（分页） */
+export interface PostListResult {
+  items: PostItem[]
+  hasMore: boolean
+  maxCursor: number
+}
+
+/** 启动下载所需参数；playUrl 为空时后端按 awemeId 自动解析（批量任务） */
 export interface StartDownloadParams {
   taskId: string
-  playUrl: string
+  playUrl?: string
   title: string
   awemeId: string
   platform: string
@@ -56,11 +78,24 @@ export function parseVideo(text: string): Promise<VideoInfo> {
 export function startDownload(p: StartDownloadParams): Promise<void> {
   return invoke('start_download', {
     taskId: p.taskId,
-    playUrl: p.playUrl,
+    playUrl: p.playUrl ?? '',
     title: p.title,
     awemeId: p.awemeId,
     platform: p.platform,
     quality: p.quality,
+  })
+}
+
+/** 拉取用户主页作品列表（a_bogus 由前端对同一组 query 签名） */
+export function fetchUserPosts(
+  secUserId: string,
+  aBogus: string,
+  maxCursor?: number | null,
+): Promise<PostListResult> {
+  return invoke<PostListResult>('fetch_user_posts', {
+    secUserId,
+    aBogus,
+    maxCursor: maxCursor ?? null,
   })
 }
 

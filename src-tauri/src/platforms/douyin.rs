@@ -13,7 +13,7 @@ use regex::Regex;
 use serde_json::Value;
 
 use crate::http::{PC_UA, ProxyCfg};
-use super::VideoInfo;
+use super::{PostItem, PostListResult, VideoInfo};
 
 // ============================================================
 // URL 检测
@@ -580,4 +580,122 @@ pub async fn parse(client: &reqwest::Client, proxy: &ProxyCfg, text: &str) -> Re
         "抖音：所有解析方案均失败（共 6 种）。\n视频 ID: {id}\n详细错误：\n  {}",
         detail
     ))
+}
+
+// ============================================================
+// 主页作品列表
+// ============================================================
+
+/// 拉取用户主页作品列表（分页，每页 20 条）。
+///
+/// `a_bogus` 由前端用 abogus.js 生成，query 参数顺序必须与前端签名串一致，
+/// 否则风控签名校验不通过。`max_cursor` 为上一页返回的分页游标（首页传 None）。
+pub async fn fetch_user_posts(
+    client: &reqwest::Client,
+    proxy: &ProxyCfg,
+    sec_user_id: &str,
+    a_bogus: &str,
+    max_cursor: Option<u64>,
+) -> Result<PostListResult, String> {
+    let ttwid = fetch_ttwid(proxy).await?;
+    let cursor = max_cursor.unwrap_or(0).to_string();
+
+    let resp = client
+        .get("https://www.douyin.com/aweme/v1/web/aweme/post/")
+        .query(&[
+            ("device_platform", "webapp"),
+            ("aid", "6383"),
+            ("channel", "channel_pc_web"),
+            ("sec_user_id", sec_user_id),
+            ("max_cursor", cursor.as_str()),
+            ("count", "20"),
+            ("a_bogus", a_bogus),
+        ])
+        .header("Cookie", format!("ttwid={ttwid}"))
+        .header(
+            "Referer",
+            format!("https://www.douyin.com/user/{sec_user_id}"),
+        )
+        .send()
+        .await
+        .map_err(|e| format!("主页 API 请求失败: {e}"))?;
+
+    let status = resp.status();
+    if !status.is_success() {
+        return Err(format!("主页 API 返回 HTTP {status}"));
+    }
+
+    let data: Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("解析主页 JSON 失败: {e}"))?;
+
+    let aweme_list = data
+        .get("aweme_list")
+        .and_then(|v| v.as_array())
+        .ok_or("未找到 aweme_list")?;
+
+    let items: Vec<PostItem> = aweme_list
+        .iter()
+        .filter_map(|a| {
+            let aweme_id = a.get("aweme_id")?.as_str()?.to_string();
+            let desc = a
+                .get("desc")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            let author = a
+                .get("author")
+                .and_then(|a| a.get("nickname"))
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            let duration_ms = a.get("duration").and_then(|v| v.as_u64()).unwrap_or(0);
+            let cover = a
+                .get("video")
+                .and_then(|v| v.get("cover"))
+                .and_then(|v| v.get("url_list"))
+                .and_then(|v| v.as_array())
+                .and_then(|v| v.first())
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string();
+            let create_time = a.get("create_time").and_then(|v| v.as_u64()).unwrap_or(0);
+            let stats = a.get("statistics").unwrap_or(&Value::Null);
+            let digg_count = stats.get("digg_count").and_then(|v| v.as_u64()).unwrap_or(0);
+            let comment_count = stats
+                .get("comment_count")
+                .and_then(|v| v.as_u64())
+                .unwrap_or(0);
+            let share_count = stats.get("share_count").and_then(|v| v.as_u64()).unwrap_or(0);
+            let collect_count = stats
+                .get("collect_count")
+                .and_then(|v| v.as_u64())
+                .unwrap_or(0);
+            let play_count = stats.get("play_count").and_then(|v| v.as_u64()).unwrap_or(0);
+
+            Some(PostItem {
+                aweme_id,
+                desc,
+                author,
+                duration_ms,
+                cover,
+                create_time,
+                digg_count,
+                comment_count,
+                share_count,
+                collect_count,
+                play_count,
+            })
+        })
+        .collect();
+
+    let has_more = data.get("has_more").and_then(|v| v.as_u64()).unwrap_or(0) == 1;
+    let max_cursor = data.get("max_cursor").and_then(|v| v.as_u64()).unwrap_or(0);
+
+    Ok(PostListResult {
+        items,
+        has_more,
+        max_cursor,
+    })
 }
