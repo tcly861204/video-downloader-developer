@@ -98,6 +98,23 @@ jobs:
           Write-Host '--- latest.json ---'
           Get-Content 'latest.json'
 
+      - name: 推送 latest.json 到公开仓库 main
+        shell: bash
+        env:
+          TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          # 先推送：公开仓库首次为空时，这一步会创建首个 commit + main 分支，
+          # 否则 Releases API 会拒绝在空仓库上建 release（HTTP 422 Repository is empty）。
+          # 用显式 refspec 推 main：clone 空仓库后本地分支没有 upstream，直接 git push 会报 no upstream
+          git clone "https://x-access-token:${TOKEN}@github.com/${RELEASES_REPO}.git" updater-repo
+          cd updater-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          cp ../latest.json ./latest.json
+          git add latest.json
+          git commit -m "chore: update latest.json for ${{ github.ref_name }}" || echo "no changes"
+          git push origin HEAD:main
+
       - name: 发布到公开仓库 Releases
         shell: bash
         env:
@@ -109,17 +126,3 @@ jobs:
             --repo "$RELEASES_REPO" \
             --title "${{ github.ref_name }}" \
             --notes "自动发布"
-
-      - name: 推送 latest.json 到公开仓库 main
-        shell: bash
-        env:
-          TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        run: |
-          git clone "https://x-access-token:${TOKEN}@github.com/${RELEASES_REPO}.git" updater-repo
-          cd updater-repo
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          cp ../latest.json ./latest.json
-          git add latest.json
-          git commit -m "chore: update latest.json for ${{ github.ref_name }}" || echo "no changes"
-          git push
