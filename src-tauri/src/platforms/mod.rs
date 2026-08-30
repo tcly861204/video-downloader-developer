@@ -4,6 +4,7 @@
 //! 对外提供 `parse(text, proxy)`：先识别平台，再调用对应实现；
 //! 以后新增平台只需加一个 `pub mod xxx` 并在下方分发即可。
 
+pub mod bilibili;
 pub mod douyin;
 pub mod kuaishou;
 
@@ -62,6 +63,9 @@ pub async fn parse(text: &str, proxy: &ProxyCfg) -> Result<VideoInfo, String> {
     if kuaishou::can_handle(text) {
         return kuaishou::parse(&client, text).await;
     }
+    if bilibili::can_handle(text) {
+        return bilibili::parse(&client, text).await;
+    }
 
-    Err("未识别的链接，目前仅支持抖音和快手分享链接".into())
+    Err("未识别的链接，目前仅支持抖音、快手和哔哩哔哩分享链接".into())
 }

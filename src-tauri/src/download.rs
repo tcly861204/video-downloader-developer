@@ -100,6 +100,22 @@ fn unique_path(dir: &Path, stem: &str, ext: &str) -> PathBuf {
     path
 }
 
+/// 按播放地址的 CDN 域名推断 Referer（各平台 CDN 校验来源域名，失败会拒绝返回内容）
+fn referer_for(url: &str) -> &'static str {
+    if url.contains("bilibili") || url.contains("bilivideo") || url.contains("hdslb") {
+        "https://www.bilibili.com/"
+    } else if url.contains("kuaishou")
+        || url.contains("yximgs")
+        || url.contains("kwimgs")
+        || url.contains("gifshow")
+        || url.contains("chenzhongtech")
+    {
+        "https://www.kuaishou.com/"
+    } else {
+        "https://www.douyin.com/"
+    }
+}
+
 /// 尝试下载一个候选地址，返回响应体（保留 Range/UA 等细节调用方控制）
 async fn try_download(
     client: &reqwest::Client,
@@ -111,7 +127,7 @@ async fn try_download(
     let mut req = client
         .get(url)
         .header("User-Agent", ua)
-        .header("Referer", "https://www.douyin.com/")
+        .header("Referer", referer_for(url))
         .header("Accept", "video/mp4,video/*,*/*")
         .header("Accept-Language", "zh-CN,zh;q=0.9")
         .header("Sec-Fetch-Dest", "video")
