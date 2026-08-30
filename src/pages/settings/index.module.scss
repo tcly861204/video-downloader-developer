@@ -1,0 +1,133 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.panel {
+  padding: 18px 20px;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.kicker {
+  font-size: 10px;
+  letter-spacing: 0.26em;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.dir {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 340px;
+}
+
+.path {
+  max-width: 240px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(148, 163, 190, 0.07);
+  font-family: var(--ff-mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.input {
+  width: 150px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(148, 163, 190, 0.07);
+  font-family: var(--ff-mono);
+  font-size: 12px;
+  color: var(--text);
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &:focus {
+    border-color: rgba(255, 176, 58, 0.5);
+    box-shadow: 0 0 0 3px rgba(255, 176, 58, 0.08);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.port {
+  width: 80px;
+}
+
+.colon {
+  font-family: var(--ff-mono);
+  color: var(--faint);
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0 4px;
+}
+
+.aboutName {
+  font-family: var(--ff-serif);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.aboutEn {
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: var(--amber);
+}
+
+.aboutDesc {
+  margin: 4px 0 0;
+  max-width: 520px;
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.aboutMeta {
+  margin-top: 8px;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--faint);
+}
+
+@media (max-width: 640px) {
+  .dir {
+    max-width: 100%;
+    flex: 1;
+  }
+}

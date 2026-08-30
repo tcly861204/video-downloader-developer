@@ -9,3 +9,10 @@
   color: var(--text);
   font-family: var(--ff-sans);
 }
+.main {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  height: calc(100vh - 43px);
+  overflow-y: auto;
+}

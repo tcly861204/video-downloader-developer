@@ -58,3 +58,114 @@ body {
   letter-spacing: 0.03em;
   color: var(--text);
 }
+
+.s-page {
+  flex: 1;
+  min-height: 100%;
+  padding: 28px clamp(20px, 3vw, 40px) 32px;
+}
+
+.s-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.s-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid rgba(148, 163, 190, 0.2);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.s-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(148, 163, 190, 0.06);
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition:
+    color 0.18s,
+    border-color 0.18s,
+    background 0.18s,
+    transform 0.18s;
+}
+.s-btn:hover {
+  color: var(--text);
+  border-color: rgba(255, 176, 58, 0.35);
+  background: rgba(255, 176, 58, 0.06);
+}
+.s-btn:active {
+  transform: translateY(1px);
+}
+.s-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.s-btn:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.s-btn--primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--amber-2), var(--amber));
+  color: #1a1208;
+  font-weight: 700;
+}
+.s-btn--primary:hover {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--amber-2), var(--amber));
+  color: #1a1208;
+  filter: brightness(1.06);
+}
+
+.s-btn--ghost {
+  border-color: rgba(148, 163, 190, 0.22);
+  background: transparent;
+}
+
+.s-btn--danger:hover {
+  border-color: rgba(255, 120, 120, 0.4);
+  background: rgba(255, 120, 120, 0.06);
+  color: #ff8a8a;
+}
+
+.s-btn--icon {
+  justify-content: center;
+  width: 34px;
+  padding: 0;
+}
+
+.s-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.s-dot--ok {
+  background: #34d97b;
+  box-shadow: 0 0 8px rgba(52, 217, 123, 0.7);
+}
+.s-dot--amber {
+  background: var(--amber);
+  box-shadow: 0 0 8px rgba(255, 176, 58, 0.6);
+}
+.s-dot--red {
+  background: #ff6b6b;
+  box-shadow: 0 0 8px rgba(255, 107, 107, 0.6);
+}
+.s-dot--muted {
+  background: #5b6a82;
+}

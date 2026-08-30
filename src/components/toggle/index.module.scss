@@ -1,0 +1,42 @@
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 190, 0.28);
+  border-radius: 999px;
+  background: rgba(148, 163, 190, 0.08);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+
+  i {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition:
+      transform 0.2s,
+      background 0.2s;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
+  }
+}
+
+.on {
+  border-color: rgba(255, 176, 58, 0.6);
+  background: rgba(255, 176, 58, 0.2);
+
+  i {
+    transform: translateX(18px);
+    background: var(--amber);
+    box-shadow: 0 0 8px rgba(255, 176, 58, 0.5);
+  }
+}

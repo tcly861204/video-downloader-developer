@@ -14,7 +14,7 @@ const Layout = () => {
       {/* ===== 内容区 ===== */}
       <section className='flex-1 flex'>
         {local.pathname === '/' || local.pathname === '/login' ? null : <Sidebar />}
-        <main className='s-main'>
+        <main className={styles.main}>
           <Outlet />
         </main>
       </section>

@@ -1,0 +1,47 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(8, 12, 20, 0.4);
+  padding: 3px;
+}
+
+.stepBtn {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(148, 163, 190, 0.08);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color 0.18s,
+    background 0.18s;
+
+  &:hover:not(:disabled) {
+    color: var(--amber);
+    background: rgba(255, 176, 58, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 1px;
+  }
+}
+
+.stepVal {
+  min-width: 26px;
+  text-align: center;
+  font-family: var(--ff-mono);
+  font-size: 13px;
+  color: var(--text);
+}
