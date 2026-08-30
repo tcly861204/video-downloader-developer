@@ -19,6 +19,7 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use tauri::Emitter;
+use tauri_plugin_notification::NotificationExt;
 
 use crate::http::{MOBILE_UA, PC_UA};
 
@@ -183,6 +184,7 @@ pub async fn run(
     platform: &str,
     quality: &str,
     resume: bool,
+    notify_done: bool,
     abort: Arc<AtomicBool>,
 ) {
     // 事件统一用 task_id 标识任务，前端按它路由到对应任务行
@@ -326,6 +328,17 @@ pub async fn run(
     }
     let final_str = final_path.to_string_lossy().to_string();
     let _ = app.emit("download-done", DownloadDone { task_id: task_id.to_string(), path: final_str });
+
+    // 系统通知：下载真正完成（去重命中的“已完成”不打扰用户）；是否弹窗由设置页“下载完成通知”控制
+    if notify_done {
+        let body: String = title.chars().take(40).collect();
+        let _ = app
+            .notification()
+            .builder()
+            .title("拾帧 · 下载完成")
+            .body(body)
+            .show();
+    }
 }
 
 // ============================================================

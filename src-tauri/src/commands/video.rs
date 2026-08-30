@@ -79,6 +79,7 @@ pub fn start_download(
     let save_dir = settings.save_dir;
     let rule = FilenameRule::from_str(&settings.filename_rule);
     let resume = settings.resume;
+    let notify_done = settings.notify_done;
 
     // 注册中止标志，供暂停使用（解析也发生在后台，暂停在解析期间即可置位）
     let abort = Arc::new(AtomicBool::new(false));
@@ -131,6 +132,7 @@ pub fn start_download(
             &platform,
             &quality,
             resume,
+            notify_done,
             abort,
         )
         .await;
