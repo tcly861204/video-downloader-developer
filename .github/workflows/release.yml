@@ -1,0 +1,125 @@
+# 自动发布：打 tag（v*）后构建 Windows NSIS 安装包并发布到公开产物仓库。
+#
+# 私有源码仓库：tcly861204/video-downloader-developer（本 workflow 在这里跑）
+# 公开产物仓库：tcly861204/video-downloader（只放安装包 + latest.json，零源码）
+#
+# 使用前需在私有源码仓库配置两个 secrets：
+#   - TAURI_SIGNING_PRIVATE_KEY         签名私钥（.keys/framecatch.key 的文件内容）
+#   - TAURI_SIGNING_PRIVATE_KEY_PASSWORD 签名私钥密码
+# 以及一个 secret（用于跨仓库推送 / 建 release）：
+#   - RELEASE_TOKEN                     经典 PAT，勾选 repo 权限
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      # 公开产物仓库，与 tauri.conf.json 的 updater.endpoints 保持一致
+      RELEASES_REPO: tcly861204/video-downloader
+    steps:
+      - name: 检出源码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: 安装 Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust 缓存
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: 安装前端依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 校验版本与 tag 一致
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag.TrimStart('v')
+          $conf = Get-Content 'src-tauri/tauri.conf.json' -Raw | ConvertFrom-Json
+          if ($conf.version -ne $ver) {
+            Write-Error "tag $tag 与 tauri.conf.json 版本 $($conf.version) 不一致，请先改版本再打 tag"
+            exit 1
+          }
+
+      - name: 构建 + 打包
+        run: pnpm tauri build
+
+      - name: 签名安装包（生成 .sig）
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem 'src-tauri/target/release/bundle/nsis/*-setup.exe' | Select-Object -First 1
+          if (-not $exe) { Write-Error '未找到 NSIS 安装包'; exit 1 }
+          # 签名密钥从环境 TAURI_SIGNING_PRIVATE_KEY / _PASSWORD 读取
+          pnpm tauri signer sign -p "$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD" "$($exe.FullName)"
+
+      - name: 生成 latest.json
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag.TrimStart('v')
+          $exe = Get-ChildItem 'src-tauri/target/release/bundle/nsis/*-setup.exe' | Select-Object -First 1
+          if (-not $exe) { Write-Error '未找到 NSIS 安装包'; exit 1 }
+          $sig = (Get-Content "$($exe.FullName).sig" -Raw).Trim()
+          $assetUrl = "https://github.com/$env:RELEASES_REPO/releases/download/$tag/$($exe.Name)"
+          $manifest = [ordered]@{
+            version   = $ver
+            notes     = ''
+            pub_date  = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+            platforms = [ordered]@{
+              'windows-x86_64' = [ordered]@{
+                signature = $sig
+                url       = $assetUrl
+              }
+            }
+          } | ConvertTo-Json -Depth 5
+          Set-Content -Path 'latest.json' -Value $manifest -Encoding utf8
+          Write-Host '--- latest.json ---'
+          Get-Content 'latest.json'
+
+      - name: 发布到公开仓库 Releases
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            src-tauri/target/release/bundle/nsis/*-setup.exe \
+            src-tauri/target/release/bundle/nsis/*.sig \
+            --repo "$RELEASES_REPO" \
+            --title "${{ github.ref_name }}" \
+            --notes "自动发布"
+
+      - name: 推送 latest.json 到公开仓库 main
+        shell: bash
+        env:
+          TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${TOKEN}@github.com/${RELEASES_REPO}.git" updater-repo
+          cd updater-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          cp ../latest.json ./latest.json
+          git add latest.json
+          git commit -m "chore: update latest.json for ${{ github.ref_name }}" || echo "no changes"
+          git push

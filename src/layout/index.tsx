@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { Header } from '@/components/header'
 import { Sidebar } from '@/components/sidebar'
 import { Background } from '@/components/background'
+import UpdaterBanner from '@/components/updater-banner'
 import { useSettingsStore } from '@/store/settings'
 import styles from './index.module.scss'
 const Layout = () => {
@@ -18,6 +19,8 @@ const Layout = () => {
       <Background />
       {/* ===== 顶部导航 ===== */}
       <Header />
+      {/* ===== 更新横幅 ===== */}
+      <UpdaterBanner />
       {/* ===== 内容区 ===== */}
       <section className='flex-1 flex'>
         {local.pathname === '/' || local.pathname === '/login' ? null : <Sidebar />}

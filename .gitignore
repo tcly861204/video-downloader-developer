@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Updater 签名私钥（严禁提交）
+.keys/
+github.key
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
