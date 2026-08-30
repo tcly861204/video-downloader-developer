@@ -325,6 +325,76 @@
   }
 }
 
+/* ---------- 免责声明 ---------- */
+
+.disclaimer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-width: 640px;
+  box-sizing: border-box;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 14px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+
+  h3 {
+    margin: 0;
+    font-family: var(--ff-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    color: var(--muted);
+  }
+}
+
+.entry {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 13px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px dashed rgba(148, 163, 190, 0.13);
+  }
+}
+
+.no {
+  flex: none;
+  font-family: var(--ff-mono);
+  font-style: normal;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--amber);
+}
+
+.txt {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  min-width: 0;
+
+  b {
+    font-family: var(--ff-serif);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+
+  span {
+    font-size: 12px;
+    line-height: 1.9;
+    color: var(--muted);
+  }
+}
+
 /* ---------- 底部状态 ---------- */
 
 .status {

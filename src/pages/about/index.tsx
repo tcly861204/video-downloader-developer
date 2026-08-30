@@ -107,6 +107,37 @@ const About = () => {
         </ul>
       </section>
 
+      {/* ===== 免责声明 ===== */}
+      <section className={styles.block}>
+        <div className={styles.disclaimer} data-reveal>
+          <div className={styles.head}>
+            <span className='s-dot s-dot--red' aria-hidden />
+            <h3>DISCLAIMER · 免责声明</h3>
+          </div>
+          <div className={styles.entry}>
+            <em className={styles.no}>01</em>
+            <p className={styles.txt}>
+              <b>个人使用许可</b>
+              <span>仅供个人学习交流，禁止商业用途与二次分发销售，详见 LICENSE。</span>
+            </p>
+          </div>
+          <div className={styles.entry}>
+            <em className={styles.no}>02</em>
+            <p className={styles.txt}>
+              <b>内容合规</b>
+              <span>下载内容请自行确认符合法律法规与平台条款，责任由使用者承担。</span>
+            </p>
+          </div>
+          <div className={styles.entry}>
+            <em className={styles.no}>03</em>
+            <p className={styles.txt}>
+              <b>无关联声明</b>
+              <span>与各视频平台无关联、无授权，接口变更可能导致功能失效。</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ===== 底部状态 ===== */}
       <footer className={styles.status}>
         <span className='s-dot s-dot--ok' aria-hidden />

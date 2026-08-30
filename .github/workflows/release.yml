@@ -111,8 +111,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           cp ../latest.json ./latest.json
-          git add latest.json
-          git commit -m "chore: update latest.json for ${{ github.ref_name }}" || echo "no changes"
+          cp ../LICENSE.md ./LICENSE.md
+          cp ../README.md ./README.md
+          git add latest.json LICENSE.md README.md
+          git commit -m "chore: update latest.json + LICENSE + README for ${{ github.ref_name }}" || echo "no changes"
           git push origin HEAD:main
 
       - name: 发布到公开仓库 Releases
