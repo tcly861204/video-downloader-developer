@@ -1,6 +1,3 @@
-if (import.meta.env.MODE !== 'development') {
-  import('@/utils/anti-debug')
-}
 import 'virtual:uno.css'
 import './styles/theme.scss'
 import React from 'react'
