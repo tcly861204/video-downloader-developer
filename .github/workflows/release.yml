@@ -115,7 +115,7 @@ jobs:
           cp ../README.md ./README.md
           cp ../screen.png ./screen.png
           cp ../download.jpg ./download.jpg
-          git add latest.json LICENSE.md README.md screen.png
+          git add latest.json LICENSE.md README.md screen.png download.jpg
           git commit -m "chore: update latest.json + LICENSE + README for ${{ github.ref_name }}" || echo "no changes"
           git push origin HEAD:main
 
