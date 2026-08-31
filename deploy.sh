@@ -1,4 +1,5 @@
 rm -rf ./framecatch
+mkdir ./framecatch
 cp -r functions ./framecatch/functions
 cd ./framecatch
 git init

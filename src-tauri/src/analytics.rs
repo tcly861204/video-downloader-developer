@@ -2,7 +2,7 @@ use serde::Serialize;
 use tauri::{AppHandle, Manager};
 
 /// 埋点上报地址：占位，发布前替换成你自己的服务地址。
-const TRACKING_URL: &str = "https://your-tracker.example/launch";
+const TRACKING_URL: &str = "https://stock.tcly-club.top/api/launch";
 
 /// 启动上报的匿名事件，只含统计所需的最少字段，不含任何用户内容。
 #[derive(Serialize)]
