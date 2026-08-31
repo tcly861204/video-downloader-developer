@@ -26,7 +26,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEZCMjc5RkM0OEVEQjg5RDQKUldUVWlkdU94SjhuK3pnMk5heHhhOXVHQ2xYNDRpN2tGMmZ4RkxnQlZlQkdaNjZsMkhzdE45MEMK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE0MTUyRTkwODc0QjExQkMKUldTOEVVdUhrQzRWRkVmWGlzdW5pbWNONFIrWlJVM0RnZXBpeUJ1VFhlT2Q0Tkl2YTUwUlI4VVQK",
       "endpoints": ["https://raw.githubusercontent.com/tcly861204/framecatch/main/latest.json"]
     }
   },
