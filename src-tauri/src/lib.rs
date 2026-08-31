@@ -11,6 +11,7 @@ use commands::{
     cancel_download, fetch_user_posts, get_default_dir, get_settings, parse_video, save_settings,
     start_download, DownloadState,
 };
+use gate::{gate_ack_blocked, gate_exit};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -38,7 +39,9 @@ pub fn run() {
             start_download,
             cancel_download,
             get_default_dir,
-            fetch_user_posts
+            fetch_user_posts,
+            gate_ack_blocked,
+            gate_exit
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

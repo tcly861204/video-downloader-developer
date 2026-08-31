@@ -1,0 +1,226 @@
+@keyframes gb-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(255, 107, 107, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+  }
+}
+
+@keyframes gb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: radial-gradient(120% 95% at 50% -8%, #191021 0%, #0a0e15 55%, #070a10 100%);
+  color: var(--text);
+  font-family: var(--ff-sans);
+}
+
+.main {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  width: min(440px, 100%);
+  padding: 34px clamp(24px, 4vw, 40px) 30px;
+  border: 1px solid rgba(255, 107, 107, 0.28);
+  border-radius: 16px;
+  background: rgba(12, 8, 16, 0.72);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  text-align: center;
+  animation: gb-rise 0.65s cubic-bezier(0.22, 0.9, 0.28, 1) 0.1s both;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  background: rgba(255, 107, 107, 0.08);
+  color: #ff6b6b;
+  animation: gb-pulse 2s ease-out infinite;
+}
+
+.kicker {
+  margin: 0;
+  font-family: var(--ff-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  color: #ff8a8a;
+}
+
+.title {
+  margin: 10px 0 0;
+  font-family: var(--ff-serif);
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+.sub {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.verdict {
+  margin: 22px 0 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(148, 163, 190, 0.05);
+  text-align: center;
+}
+
+.verdictTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ff-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--faint);
+}
+
+.reason {
+  margin: 9px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  word-break: break-word;
+}
+
+.meta {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 18px;
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--faint);
+}
+
+.exit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 44px;
+  margin-top: 24px;
+  padding: 0 26px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff8a8a, #ff5f5f);
+  color: #2a0d0d;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.25);
+  transition:
+    transform 0.18s,
+    box-shadow 0.25s,
+    filter 0.25s;
+}
+
+.exit:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow: 0 12px 30px rgba(255, 107, 107, 0.34);
+}
+
+.exit:active {
+  transform: translateY(0);
+}
+
+.exit:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.foot {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  font-family: var(--ff-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--faint);
+}
+
+/* ---------- 矮窗口适配 ---------- */
+@media (max-height: 620px) {
+  .card {
+    padding: 22px 28px 22px;
+  }
+  .icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 10px;
+  }
+  .verdict {
+    margin-top: 16px;
+    padding: 10px 14px;
+  }
+  .meta {
+    margin-top: 14px;
+  }
+  .exit {
+    height: 40px;
+    margin-top: 18px;
+  }
+}
+
+/* ---------- 窄窗口适配 ---------- */
+@media (max-width: 420px) {
+  .main {
+    padding: 16px;
+  }
+}
+
+/* ---------- 减少动效 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .icon {
+    animation: none !important;
+  }
+}
