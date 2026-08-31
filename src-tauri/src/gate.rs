@@ -9,11 +9,16 @@ const GATE_URL: &str = "https://stock.tcly-club.top/api/gate";
 /// 启动后延迟多久做首次检查（毫秒）：先让主窗口渲染出来，避免一上来就弹窗。
 const INITIAL_DELAY_MS: u64 = 800;
 
-/// 定期复查间隔（秒）：负责"踢出"正在使用的被封设备，10 分钟一次足够。
-const RECHECK_INTERVAL_SECS: u64 = 600;
+/// 定期复查间隔（秒）：负责"踢出"正在使用的被封设备，1 小时一次足够。
+const RECHECK_INTERVAL_SECS: u64 = 3600;
 
 /// 前端确认遮罩展示的超时（秒）：前端未就绪时退回原生弹窗，保证"封禁必踢"。
 const ACK_TIMEOUT_SECS: u64 = 6;
+
+/// 重试基础间隔（秒）：接口不稳定时指数退避重试的起始值。
+const RETRY_BASE_DELAY_SECS: u64 = 1;
+/// 重试最大间隔（秒）：退避封顶，避免对不稳定接口频繁轰炸。
+const RETRY_MAX_DELAY_SECS: u64 = 30;
 
 /// 服务器裁决响应。
 #[derive(Deserialize)]
@@ -65,9 +70,9 @@ fn gate_url() -> String {
 }
 
 /// 查询服务器裁决。返回 `Some(原因)` 表示该设备已被禁止使用。
-/// 网络错误、超时、非 JSON 响应一律视为放行（fail-open），避免离线误伤正常用户；
-/// 后续周期复查会再兜住"上线后被封"的情况。
-/// 设置 FRAMECATCH_GATE_DEBUG=1 会在终端打印请求与响应，便于开发测试排查。
+/// 接口不稳定：这里持续重试直到拿到有效 2xx 响应，避免一次抖动漏判封禁；
+/// 重试间隔指数退避并封顶（见 RETRY_BASE/MAX_DELAY_SECS）。
+/// 设置 FRAMECATCH_GATE_DEBUG=1 会在终端打印请求、响应与每次重试，便于排查。
 async fn check_blocked(app: &AppHandle) -> Option<String> {
     let Ok(client) = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(5))
@@ -77,23 +82,59 @@ async fn check_blocked(app: &AppHandle) -> Option<String> {
     };
     let id = crate::analytics::device_id();
     let url = gate_url();
-    if std::env::var("FRAMECATCH_GATE_DEBUG").is_ok() {
-        eprintln!("[gate] POST {url} id={id}");
-    }
     let body = serde_json::json!({
         "id": id,
         "v": app.package_info().version.to_string(),
         "os": std::env::consts::OS,
     });
-    let payload: GateResponse = client.post(&url).json(&body).send().await.ok()?.json().await.ok()?;
     if std::env::var("FRAMECATCH_GATE_DEBUG").is_ok() {
-        eprintln!("[gate] response: {} {:?}", payload.status, payload.reason);
+        eprintln!("[gate] POST {url} id={id}");
     }
-    (payload.status == "blocked").then(|| {
-        payload
-            .reason
-            .unwrap_or_else(|| "该设备已被禁止使用本软件".to_string())
-    })
+    let mut delay = RETRY_BASE_DELAY_SECS;
+    loop {
+        match probe(&client, &url, &body).await {
+            GateProbe::Verdict(payload) => {
+                if std::env::var("FRAMECATCH_GATE_DEBUG").is_ok() {
+                    eprintln!("[gate] response: {} {:?}", payload.status, payload.reason);
+                }
+                return (payload.status == "blocked").then(|| {
+                    payload
+                        .reason
+                        .unwrap_or_else(|| "该设备已被禁止使用本软件".to_string())
+                });
+            }
+            GateProbe::Retry => {
+                if std::env::var("FRAMECATCH_GATE_DEBUG").is_ok() {
+                    eprintln!("[gate] retry in {delay}s…");
+                }
+                tokio::time::sleep(std::time::Duration::from_secs(delay)).await;
+                delay = (delay * 2).min(RETRY_MAX_DELAY_SECS);
+            }
+        }
+    }
+}
+
+/// 单次请求结果：拿到有效裁决继续，否则进入指数退避重试。
+enum GateProbe {
+    /// 拿到 2xx 且成功解析的裁决
+    Verdict(GateResponse),
+    /// 需要重试：网络错误、超时、非 2xx、或响应无法解析
+    Retry,
+}
+
+/// 发起一次 POST 并尝试解析裁决；任何异常都归为 `Retry`。
+async fn probe(client: &reqwest::Client, url: &str, body: &serde_json::Value) -> GateProbe {
+    let resp = match client.post(url).json(body).send().await {
+        Ok(r) => r,
+        Err(_) => return GateProbe::Retry,
+    };
+    if !resp.status().is_success() {
+        return GateProbe::Retry;
+    }
+    match resp.json::<GateResponse>().await {
+        Ok(v) => GateProbe::Verdict(v),
+        Err(_) => GateProbe::Retry,
+    }
 }
 
 /// 命中封禁：优先通知前端渲染封禁界面。
