@@ -69,10 +69,15 @@ fn gate_url() -> String {
     std::env::var("FRAMECATCH_GATE_URL").unwrap_or_else(|_| GATE_URL.to_string())
 }
 
+/// 开发环境（debug 构建）自动在终端打印请求、响应与每次重试，便于联调；
+/// 发布版仍可用 FRAMECATCH_GATE_DEBUG=1 临时开启。
+fn gate_debug() -> bool {
+    cfg!(debug_assertions) || std::env::var("FRAMECATCH_GATE_DEBUG").is_ok()
+}
+
 /// 查询服务器裁决。返回 `Some(原因)` 表示该设备已被禁止使用。
 /// 接口不稳定：这里持续重试直到拿到有效 2xx 响应，避免一次抖动漏判封禁；
 /// 重试间隔指数退避并封顶（见 RETRY_BASE/MAX_DELAY_SECS）。
-/// 设置 FRAMECATCH_GATE_DEBUG=1 会在终端打印请求、响应与每次重试，便于排查。
 async fn check_blocked(app: &AppHandle) -> Option<String> {
     let Ok(client) = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(5))
@@ -87,14 +92,14 @@ async fn check_blocked(app: &AppHandle) -> Option<String> {
         "v": app.package_info().version.to_string(),
         "os": std::env::consts::OS,
     });
-    if std::env::var("FRAMECATCH_GATE_DEBUG").is_ok() {
+    if gate_debug() {
         eprintln!("[gate] POST {url} id={id}");
     }
     let mut delay = RETRY_BASE_DELAY_SECS;
     loop {
         match probe(&client, &url, &body).await {
             GateProbe::Verdict(payload) => {
-                if std::env::var("FRAMECATCH_GATE_DEBUG").is_ok() {
+                if gate_debug() {
                     eprintln!("[gate] response: {} {:?}", payload.status, payload.reason);
                 }
                 return (payload.status == "blocked").then(|| {
@@ -104,7 +109,7 @@ async fn check_blocked(app: &AppHandle) -> Option<String> {
                 });
             }
             GateProbe::Retry => {
-                if std::env::var("FRAMECATCH_GATE_DEBUG").is_ok() {
+                if gate_debug() {
                     eprintln!("[gate] retry in {delay}s…");
                 }
                 tokio::time::sleep(std::time::Duration::from_secs(delay)).await;
@@ -116,9 +121,9 @@ async fn check_blocked(app: &AppHandle) -> Option<String> {
 
 /// 单次请求结果：拿到有效裁决继续，否则进入指数退避重试。
 enum GateProbe {
-    /// 拿到 2xx 且成功解析的裁决
+    /// 拿到 200/403 且成功解析的裁决
     Verdict(GateResponse),
-    /// 需要重试：网络错误、超时、非 2xx、或响应无法解析
+    /// 需要重试：网络错误、超时、非 200/403、或响应无法解析
     Retry,
 }
 
@@ -128,7 +133,9 @@ async fn probe(client: &reqwest::Client, url: &str, body: &serde_json::Value) ->
         Ok(r) => r,
         Err(_) => return GateProbe::Retry,
     };
-    if !resp.status().is_success() {
+    // 协议里 200=放行、403=封禁 都是有效裁决；
+    // 之前误把 403 当失败重试，导致被封设备无限重试、永远走不到弹窗。
+    if !matches!(resp.status().as_u16(), 200 | 403) {
         return GateProbe::Retry;
     }
     match resp.json::<GateResponse>().await {
