@@ -22,8 +22,8 @@
 //   ban    → 对方下次启动或 10 分钟内被弹窗踢出
 //   unban  → 恢复正常使用
 //
-// 说明：封禁状态存在 launch_events 表的 is_banned 字段（见 launch.js 头注释）。
-// 若该设备从未上报过埋点（查无此人），会自动插入一条占位记录，保证封禁立即生效。
+// 说明：封禁状态存在 devices 表（一台设备一行，见 launch.js 头注释）。
+// 用 UPSERT 写入：即使该设备从未上报过埋点，也会直接建行，封禁立即生效。
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -67,31 +67,23 @@ export async function onRequestPost(context) {
   const banReason = typeof reason === "string" && reason.trim() ? reason.trim() : null;
 
   if (action === "ban") {
-    // 封禁：该设备所有历史行都标记为 1（gate 判定"存在任一封禁行"即拦截）
-    const info = await db
+    // 封禁：UPSERT 到 devices 表。设备从未上报过也会直接建行，无需占位 hack
+    await db
       .prepare(
-        `UPDATE launch_events
-         SET is_banned = 1, ban_reason = ?2, banned_at = datetime('now','localtime')
-         WHERE device_id = ?1`
+        `INSERT INTO devices (device_id, is_banned, ban_reason, banned_at)
+         VALUES (?1, 1, ?2, datetime('now','localtime'))
+         ON CONFLICT(device_id) DO UPDATE SET
+           is_banned   = 1,
+           ban_reason  = excluded.ban_reason,
+           banned_at   = excluded.banned_at`
       )
       .bind(id, banReason)
       .run();
-
-    // 该设备从未上报过 → 插入一条占位记录，保证封禁立即生效
-    if (info.meta.changes === 0) {
-      await db
-        .prepare(
-          `INSERT INTO launch_events (v, os, device_id, is_banned, ban_reason, banned_at)
-           VALUES ('0.0.0', 'manual', ?1, 1, ?2, datetime('now','localtime'))`
-        )
-        .bind(id, banReason)
-        .run();
-    }
   } else {
-    // 解封：所有行置 0
+    // 解封：状态置 0，保留设备行（后续启动会刷新 last_seen_at）
     await db
       .prepare(
-        `UPDATE launch_events
+        `UPDATE devices
          SET is_banned = 0, ban_reason = NULL, banned_at = NULL
          WHERE device_id = ?1`
       )
