@@ -1,7 +1,7 @@
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
 
-/// 埋点上报地址：占位，发布前替换成你自己的服务地址。
+/// 埋点上报地址：Cloudflare Pages Function /api/launch。
 const TRACKING_URL: &str = "https://stock.tcly-club.top/api/launch";
 
 /// 启动上报的匿名事件，只含统计所需的最少字段，不含任何用户内容。
@@ -28,11 +28,25 @@ pub fn report_launch(app: &AppHandle) {
     };
     // fire-and-forget：不阻塞主线程，5 秒超时防止拖慢退出
     tauri::async_runtime::spawn(async move {
-        if let Ok(client) = reqwest::Client::builder()
+        let Ok(client) = reqwest::Client::builder()
             .timeout(std::time::Duration::from_secs(5))
             .build()
-        {
-            let _ = client.post(TRACKING_URL).json(&event).send().await;
+        else {
+            return;
+        };
+        // 接口不稳定：重试直到成功（应用退出时后台任务会被丢弃）。仅网络错误或
+        // 5xx 服务端错误重试；4xx 客户端错误重试无用，直接放弃。
+        // 退避从 1s 指数翻倍，封顶 60s，避免服务器长期不可用时一直轰炸。
+        for attempt in 0.. {
+            let should_retry = match client.post(TRACKING_URL).json(&event).send().await {
+                Ok(resp) => resp.status().is_server_error(),
+                Err(_) => true,
+            };
+            if !should_retry {
+                break;
+            }
+            let backoff = (1u64 << attempt.min(6)).min(60); // 1,2,4,8,16,32,60,60,...
+            tokio::time::sleep(std::time::Duration::from_secs(backoff)).await;
         }
     });
 }
