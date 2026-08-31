@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "PowerShell(gh *)"
+      "PowerShell(gh *)",
+      "PowerShell(cargo check *)"
     ]
   }
 }

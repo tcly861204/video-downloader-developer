@@ -17,14 +17,22 @@ pub struct ProxyCfg {
     pub port: String,
 }
 
+/// 国内视频站域名（含各平台 CDN）：直连更快更稳，走境外代理反而会失败或触发风控。
+/// `NoProxy` 的 Suffix 匹配会同时覆盖域名本身及其所有子域名，故无需逐个子域列出。
+const NO_PROXY_DOMAINS: &str = "douyin.com,iesdouyin.com,bytedance.com,snssdk.com,amemv.com,kuaishou.com,kuaishouapp.com,yximgs.com,kwimgs.com,gifshow.com,chenzhongtech.com,bilibili.com,bilibili.tv,bilivideo.com,hdslb.com,haokan.com,baidu.com,bdstatic.com";
+
 impl ProxyCfg {
-    /// 转成 reqwest::Proxy；未启用或 host 为空时返回 None
+    /// 转成 reqwest::Proxy；未启用或 host 为空时返回 None。
+    /// 国内视频站命中 `NO_PROXY_DOMAINS` 时绕过代理直连。
     pub fn to_reqwest(&self) -> Option<reqwest::Proxy> {
         if !self.enabled || self.host.trim().is_empty() {
             return None;
         }
         let url = format!("http://{}:{}", self.host.trim(), self.port.trim());
-        reqwest::Proxy::all(&url).ok()
+        let proxy = reqwest::Proxy::all(&url).ok()?;
+        let no_proxy = reqwest::NoProxy::from_string(NO_PROXY_DOMAINS)
+            .expect("静态 NO_PROXY_DOMAINS 列表可解析");
+        Some(proxy.no_proxy(Some(no_proxy)))
     }
 }
 
