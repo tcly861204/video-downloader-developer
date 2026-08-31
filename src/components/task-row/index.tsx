@@ -1,8 +1,11 @@
-import { useState, type CSSProperties } from 'react'
+import { useCallback, useState, type CSSProperties } from 'react'
 import { Clapperboard, FolderOpen, Pause, Play, RotateCw, Trash2 } from 'lucide-react'
 import type { DownloadTask, TaskStatus } from '@/store/download'
 import { formatBytes, formatEta, formatSpeed, formatTime } from '@/utils/format'
+import { getFileExtension } from '@/utils/util'
 import styles from './index.module.scss'
+import Preview from 'lyfa-preview'
+import 'lyfa-preview/dist/style.min.css'
 
 const STATUS_TEXT: Record<TaskStatus, string> = {
   queued: '排队中',
@@ -13,13 +16,13 @@ const STATUS_TEXT: Record<TaskStatus, string> = {
 }
 
 const PLATFORM_COLORS: Record<string, string> = {
-  哔哩哔哩: '#fb7299',
-  YouTube: '#ff4d5a',
-  抖音: '#25f4ee',
-  快手: '#ff6b3d',
-  好看视频: '#2e7cf6',
-  TikTok: '#69c9ff',
-  Vimeo: '#1ab7ea',
+  '哔哩哔哩': '#fb7299',
+  'YouTube': '#ff4d5a',
+  '抖音': '#25f4ee',
+  '快手': '#ff6b3d',
+  '好看视频': '#2e7cf6',
+  'TikTok': '#69c9ff',
+  'Vimeo': '#1ab7ea',
   'X · Twitter': '#7aa2ff',
 }
 
@@ -58,10 +61,23 @@ export function TaskRow({
   const isActive = task.status === 'downloading'
   // 有封面且加载成功 → 显示封面；否则回退到占位图标
   const showCover = !!task.cover && !coverFailed
+  const onPriview = useCallback(() => {
+    if (showCover) {
+      new Preview({
+        list: [
+          {
+            ext: getFileExtension(task.cover!) || 'jpeg',
+            name: task.title,
+            src: task.cover!,
+          },
+        ],
+      }).display(0)
+    }
+  }, [showCover, task])
 
   return (
     <article className={styles.row}>
-      <div className={styles.thumb} style={{ '--pc': color } as CSSProperties}>
+      <div className={styles.thumb} onClick={onPriview} style={{ '--pc': color } as CSSProperties}>
         {showCover ? (
           <img
             className={styles.cover}
@@ -132,11 +148,19 @@ export function TaskRow({
               <RotateCw size={14} />
             </button>
           ) : (
-            <button className='s-btn s-btn--icon' title='打开所在文件夹' onClick={() => onOpen(task.id)}>
+            <button
+              className='s-btn s-btn--icon'
+              title='打开所在文件夹'
+              onClick={() => onOpen(task.id)}
+            >
               <FolderOpen size={14} />
             </button>
           )}
-          <button className='s-btn s-btn--icon s-btn--danger' title='删除任务' onClick={() => onRemove(task.id)}>
+          <button
+            className='s-btn s-btn--icon s-btn--danger'
+            title='删除任务'
+            onClick={() => onRemove(task.id)}
+          >
             <Trash2 size={14} />
           </button>
         </div>
