@@ -2,6 +2,7 @@ mod analytics;
 mod commands;
 mod config;
 mod download;
+mod gate;
 mod http;
 mod platforms;
 mod tray;
@@ -26,6 +27,8 @@ pub fn run() {
             tray::init(app.handle())?;
             // 启动埋点：调试构建内部会跳过，仅发布版上报
             analytics::report_launch(app.handle());
+            // 封禁检查：命中封禁会弹窗说明并退出应用（调试构建跳过）
+            gate::init(app.handle());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

@@ -34,4 +34,5 @@ percent-encoding = "2"
 url = "2"
 uuid = { version = "1", features = ["v4"] }
 md-5 = "0.10"
+machine-uid = "0.6"
 
