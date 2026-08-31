@@ -18,6 +18,7 @@
 ## 界面预览
 
 ![FRAMECATCH 界面](screen.png)
+![FRAMECATCH 下载中心](download.jpg)
 
 ## 支持的平台
 
