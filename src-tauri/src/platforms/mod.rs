@@ -86,5 +86,5 @@ pub async fn parse(text: &str, proxy: &ProxyCfg) -> Result<VideoInfo, String> {
         return pornhub::parse(&client, text).await;
     }
 
-    Err("未识别的链接，目前仅支持抖音、快手、哔哩哔哩、好看视频和 Pornhub 分享链接".into())
+    Err("未识别的链接，目前仅支持抖音、快手、哔哩哔哩、好看视频 分享链接".into())
 }
