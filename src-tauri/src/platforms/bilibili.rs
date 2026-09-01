@@ -154,5 +154,6 @@ pub async fn parse(client: &reqwest::Client, text: &str) -> Result<VideoInfo, St
         cover,
         play_url: url.to_string(),
         platform: "哔哩哔哩".to_string(),
+        quality_options: Vec::new(),
     })
 }

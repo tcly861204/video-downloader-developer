@@ -21,8 +21,9 @@ import {
   type DownloadError,
   type DownloadProgress,
   type PostItem,
+  type QualityOption,
 } from '@/api/video'
-import { qualityLabel, useSettingsStore } from '@/store/settings'
+import { qualityLabel, useSettingsStore, type Quality } from '@/store/settings'
 
 export type TaskStatus = 'queued' | 'downloading' | 'paused' | 'completed' | 'failed'
 
@@ -52,6 +53,8 @@ export interface DownloadTask {
   requested?: boolean
   savePath?: string
   error?: string
+  /** 可选清晰度档位（Pornhub 等多档平台），非空时任务行展示清晰度下拉 */
+  qualityOptions?: QualityOption[]
 }
 
 interface DownloadState {
@@ -61,6 +64,8 @@ interface DownloadState {
   setPendingUrl: (url: string | null) => void
   /** 解析链接并入队（不自动下载）；失败时抛出给页面显示 */
   parseAndAdd: (text: string) => Promise<void>
+  /** 切换某任务的清晰度档位：同步更新播放地址与档位标签 */
+  setQuality: (id: string, label: string) => void
   /** 批量入队：把主页作品创建为已请求的下载任务，返回任务 id 列表 */
   enqueueBatch: (posts: PostItem[]) => string[]
   start: (id: string) => Promise<void>
@@ -71,6 +76,24 @@ interface DownloadState {
   clearCompleted: () => void
   pauseAll: () => void
   resumeAll: () => void
+}
+
+// 从档位标签里解析分辨率（'1080P' → 1080），取不到返回 0
+function optionNum(label: string): number {
+  const m = label.match(/(\d+)/)
+  return m ? Number(m[1]) : 0
+}
+
+/**
+ * 按全局默认清晰度在真实档位里挑最合适的一项：
+ * - 原画 → 取最高档
+ * - 指定 1080/720/480 → 取「不超过该值」里最高的；全都不满足则取最低档
+ */
+function pickQualityOption(options: QualityOption[], requested: Quality): QualityOption {
+  const sorted = [...options].sort((a, b) => optionNum(b.label) - optionNum(a.label))
+  if (requested === 'original') return sorted[0]
+  const cap = optionNum(requested)
+  return sorted.find((o) => optionNum(o.label) <= cap) ?? sorted[sorted.length - 1]
 }
 
 // 速度采样：taskId → 上次进度字节 + 时间戳
@@ -165,23 +188,44 @@ export const useDownloadStore = create<DownloadState>((set, get) => ({
       throw `该视频已在下载列表中，无需重复添加`
     }
     const settings = useSettingsStore.getState()
+    // 有清晰度档位时按全局默认清晰度挑一项，同步更新播放地址与档位标签
+    const options = info.qualityOptions || []
+    let playUrl = info.playUrl
+    let quality = qualityLabel(settings.defaultQuality)
+    if (options.length > 0) {
+      const picked = pickQualityOption(options, settings.defaultQuality)
+      playUrl = picked.playUrl
+      quality = picked.label
+    }
     const task: DownloadTask = {
       id: nanoid(),
       title: info.title || '抖音视频',
       platform: info.platform || '抖音',
-      quality: qualityLabel(settings.defaultQuality),
+      quality,
       size: 0,
       downloaded: 0,
       speed: 0,
       status: 'queued',
       createdAt: Date.now(),
       awemeId: info.awemeId,
-      playUrl: info.playUrl,
+      playUrl,
       cover: info.cover || undefined,
+      qualityOptions: options.length > 0 ? options : undefined,
       // 解析出来的任务默认不自动下载，等用户点击「下载」才标记 requested
       requested: false,
     }
     set((s) => ({ tasks: [task, ...s.tasks] }))
+  },
+
+  setQuality: (id, label) => {
+    set((s) => ({
+      tasks: s.tasks.map((t) => {
+        if (t.id !== id) return t
+        const opt = t.qualityOptions?.find((o) => o.label === label)
+        if (!opt) return t
+        return { ...t, quality: opt.label, playUrl: opt.playUrl }
+      }),
+    }))
   },
 
   // 批量入队：主页作品 → 下载任务（queued + requested）。

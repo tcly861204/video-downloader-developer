@@ -21,6 +21,7 @@ const PLATFORM_COLORS: Record<string, string> = {
   '抖音': '#25f4ee',
   '快手': '#ff6b3d',
   '好看视频': '#2e7cf6',
+  'Pornhub': '#ff9000',
   'TikTok': '#69c9ff',
   'Vimeo': '#1ab7ea',
   'X · Twitter': '#7aa2ff',
@@ -46,6 +47,7 @@ export function TaskRow({
   onRetry,
   onRemove,
   onOpen,
+  onQuality,
 }: {
   task: DownloadTask
   onPause: (id: string) => void
@@ -53,12 +55,15 @@ export function TaskRow({
   onRetry: (id: string) => void
   onRemove: (id: string) => void
   onOpen: (id: string) => void
+  onQuality: (id: string, label: string) => void
 }) {
   const [coverFailed, setCoverFailed] = useState(false)
   const pct = task.size > 0 ? Math.min(100, Math.round((task.downloaded / task.size) * 100)) : 0
   const remaining = Math.max(0, task.size - task.downloaded)
   const color = PLATFORM_COLORS[task.platform] || 'var(--amber)'
   const isActive = task.status === 'downloading'
+  // 多档位平台展示清晰度下拉；否则显示静态标签
+  const hasQuality = !!task.qualityOptions && task.qualityOptions.length > 0
   // 有封面且加载成功 → 显示封面；否则回退到占位图标
   const showCover = !!task.cover && !coverFailed
   const onPriview = useCallback(() => {
@@ -98,7 +103,23 @@ export function TaskRow({
           <h3 className={styles.title} title={task.title}>
             {task.title}
           </h3>
-          <span className='s-tag'>{task.quality}</span>
+          {hasQuality ? (
+            <select
+              className={styles.quality}
+              value={task.quality}
+              disabled={isActive}
+              title='清晰度'
+              onChange={(e) => onQuality(task.id, e.target.value)}
+            >
+              {task.qualityOptions!.map((o) => (
+                <option key={o.label} value={o.label}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <span className='s-tag'>{task.quality}</span>
+          )}
         </div>
 
         <div className={styles.progress}>
@@ -123,6 +144,12 @@ export function TaskRow({
             </span>
           )}
         </div>
+
+        {task.status === 'failed' && task.error && (
+          <p className={styles.error} title={task.error}>
+            {task.error}
+          </p>
+        )}
       </div>
 
       <div className={styles.side}>

@@ -183,5 +183,6 @@ pub async fn parse(client: &reqwest::Client, text: &str) -> Result<VideoInfo, St
         cover: meta["poster"].as_str().unwrap_or("").to_string(),
         play_url,
         platform: "好看视频".to_string(),
+        quality_options: Vec::new(),
     })
 }

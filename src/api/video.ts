@@ -7,6 +7,12 @@
 import { invoke } from '@tauri-apps/api/core'
 import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 
+/** 一个可选清晰度档位：标签 + 该档位播放地址（Pornhub 等多档平台解析时带回） */
+export interface QualityOption {
+  label: string
+  playUrl: string
+}
+
 /** 解析出的视频元信息 */
 export interface VideoInfo {
   awemeId: string
@@ -18,6 +24,8 @@ export interface VideoInfo {
   playUrl: string
   /** 平台中文标签（如 抖音 / 快手） */
   platform: string
+  /** 可选清晰度档位；无档位概念的平台返回空数组 */
+  qualityOptions: QualityOption[]
 }
 
 /** 下载进度事件负载 */

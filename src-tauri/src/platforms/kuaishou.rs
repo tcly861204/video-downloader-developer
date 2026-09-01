@@ -260,6 +260,7 @@ fn extract_video_from_apollo_cache_root(data: &Value, photo_id: &str) -> Option<
         cover,
         play_url: play_url.to_string(),
         platform: "快手".to_string(),
+        quality_options: Vec::new(),
     })
 }
 
@@ -510,6 +511,7 @@ fn try_extract_video_node(node: &Value, photo_id: &str, check_nested: bool) -> O
         cover,
         play_url,
         platform: "快手".to_string(),
+        quality_options: Vec::new(),
     })
 }
 
@@ -556,6 +558,7 @@ fn extract_video_from_cdn(html: &str, photo_id: &str) -> Option<VideoInfo> {
         cover: String::new(),
         play_url,
         platform: "快手".to_string(),
+        quality_options: Vec::new(),
     })
 }
 
@@ -662,6 +665,7 @@ async fn try_graphql_api(
         cover,
         play_url: play_url.to_string(),
         platform: "快手".to_string(),
+        quality_options: Vec::new(),
     })
 }
 

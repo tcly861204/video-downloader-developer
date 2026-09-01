@@ -130,7 +130,6 @@ const Downloads = () => {
                 <span className='s-tag'>快手</span>
                 <span className='s-tag'>哔哩哔哩</span>
                 <span className='s-tag'>好看视频</span>
-                <span className='s-tag'>YouTube</span>
               </>
             ) : (
               <>
@@ -270,6 +269,7 @@ const Downloads = () => {
               onRetry={actions.retry}
               onRemove={actions.remove}
               onOpen={handleOpen}
+              onQuality={actions.setQuality}
             />
           ))
         )}

@@ -190,6 +190,7 @@ fn detail_to_info(id: &str, detail: &Value) -> Result<VideoInfo, String> {
         cover,
         play_url,
         platform: "抖音".to_string(),
+        quality_options: Vec::new(),
     })
 }
 
@@ -330,6 +331,7 @@ fn parse_from_html(id: &str, html: &str) -> Result<VideoInfo, String> {
             cover: String::new(),
             play_url,
             platform: "抖音".to_string(),
+            quality_options: Vec::new(),
         });
     }
 

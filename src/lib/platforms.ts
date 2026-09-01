@@ -69,6 +69,16 @@ export const PLATFORMS: PlatformMeta[] = [
     desc: '百度旗下短视频',
     caps: ['分享链接解析', '多清晰度直链'],
   },
+  // {
+  //   key: 'pornhub',
+  //   name: 'Pornhub',
+  //   en: 'PORNHUB',
+  //   color: '#ff9000',
+  //   status: 'locked',
+  //   icon: Play,
+  //   desc: '成人视频平台',
+  //   caps: ['viewkey 链接解析', 'MP4 直链下载', '需代理访问'],
+  // },
   {
     key: 'youtube',
     name: 'YouTube',
