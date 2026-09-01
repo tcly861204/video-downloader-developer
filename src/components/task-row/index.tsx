@@ -3,6 +3,7 @@ import { Clapperboard, FolderOpen, Pause, Play, RotateCw, Trash2 } from 'lucide-
 import type { DownloadTask, TaskStatus } from '@/store/download'
 import { formatBytes, formatEta, formatSpeed, formatTime } from '@/utils/format'
 import { getFileExtension } from '@/utils/util'
+import { QualitySelect } from '@/components/quality-select'
 import styles from './index.module.scss'
 import Preview from 'lyfa-preview'
 import 'lyfa-preview/dist/style.min.css'
@@ -104,19 +105,12 @@ export function TaskRow({
             {task.title}
           </h3>
           {hasQuality ? (
-            <select
-              className={styles.quality}
+            <QualitySelect
               value={task.quality}
+              options={task.qualityOptions!}
               disabled={isActive}
-              title='清晰度'
-              onChange={(e) => onQuality(task.id, e.target.value)}
-            >
-              {task.qualityOptions!.map((o) => (
-                <option key={o.label} value={o.label}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+              onChange={(label) => onQuality(task.id, label)}
+            />
           ) : (
             <span className='s-tag'>{task.quality}</span>
           )}
