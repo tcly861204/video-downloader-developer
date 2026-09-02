@@ -84,9 +84,10 @@ fn find_matching_brace(html: &str, open_pos: usize) -> Option<usize> {
     None
 }
 
-/// 提取 `var flashvars_<id> = {...}` 里的 JSON（用括号计数，比非贪婪正则稳健）
+/// 提取 `var flashvars_<id> = {...}` 里的 JSON（用括号计数，比非贪婪正则稳健）。
+/// viewkey 是字母数字混合（如 `6a9007b90a961`），故 id 部分不能用 `\d+`，否则全漏掉。
 fn extract_flashvars(html: &str) -> Option<String> {
-    let re = Regex::new(r"flashvars_\d+\s*=\s*\{").ok()?;
+    let re = Regex::new(r"flashvars_[A-Za-z0-9]+\s*=\s*\{").ok()?;
     let m = re.find(html)?;
     let open_pos = m.end() - 1;
     let close_pos = find_matching_brace(html, open_pos)?;
@@ -154,9 +155,10 @@ async fn collect_candidates(
     }
 
     // 2) 兜底 JS 变量：media_xxx / quality_xxx / qualityItems_xxx
+    //    （`var ` 前缀可选，页面里也可能是 `window.media_<id> = ...` 等写法）
     if cands.is_empty() {
         if let Ok(re) =
-            Regex::new(r#"var\s+(?:media|quality)_\w+\s*=\s*["']([^"']+)["']"#)
+            Regex::new(r#"(?:var\s+)?(?:media|quality)_\w+\s*=\s*["']([^"']+)["']"#)
         {
             for cap in re.captures_iter(html) {
                 let u = cap[1].to_string();
@@ -338,6 +340,26 @@ fn describe_candidates(cands: &[(String, u64)]) -> String {
     lines.join("\n")
 }
 
+/// 页面快照，供「零候选」时排障：能看出拿到的到底是视频页还是风控/拦截页
+fn page_snapshot(html: &str) -> String {
+    let flashvars = if extract_flashvars(html).is_some() {
+        "有"
+    } else {
+        "无"
+    };
+    let mp4 = Regex::new(r"\.mp4").ok().map(|r| r.find_iter(html).count()).unwrap_or(0);
+    let m3u8 = Regex::new(r"m3u8").ok().map(|r| r.find_iter(html).count()).unwrap_or(0);
+    let btn = Regex::new(r"downloadBtn")
+        .ok()
+        .map(|r| r.find_iter(html).count())
+        .unwrap_or(0);
+    let title = title_from_html(html);
+    format!(
+        "页面快照：长度 {} 字节，标题「{title}」，flashvars={flashvars}，.mp4 出现 {mp4} 次，m3u8 出现 {m3u8} 次，downloadBtn 出现 {btn} 次",
+        html.len()
+    )
+}
+
 // ============================================================
 // 元信息提取
 // ============================================================
@@ -441,7 +463,8 @@ async fn try_extract(
             Some(u) => u,
             None => {
                 return Err(format!(
-                    "未找到可用的直链（既无 MP4 也无 HLS 流）\n候选地址：\n{}",
+                    "未找到可用的直链（既无 MP4 也无 HLS 流）\n{}\n候选地址：\n{}",
+                    page_snapshot(html),
                     describe_candidates(&cands)
                 ));
             }
@@ -584,6 +607,16 @@ From:&nbsp;<a class="usernameBadgesWrapper" href="/users/myuser">MyUser</a>
         assert!(can_handle("https://www.pornhub.com/view_video.php?viewkey=679db53d02b5d"));
         assert!(can_handle("PORNHUB.COM/view_video.php?viewkey=ph123"));
         assert!(!can_handle("https://v.douyin.com/abc"));
+    }
+
+    #[test]
+    fn flashvars_extracted_with_alphanumeric_viewkey() {
+        // 真实 viewkey 是字母数字混合（如 6a9007b90a961），旧正则 flashvars_\d+ 会整个漏掉
+        let html = r#"<html><script>var flashvars_6a9007b90a961 = {"video_duration": 361, "mediaDefinitions": [{"quality": 720, "videoUrl": "https://hw-cdn.phncdn.com/videos/720P_1.mp4?t=x"}]};</script></html>"#;
+        let json = extract_flashvars(html).expect("应提取到 flashvars（字母数字 viewkey）");
+        let v: Value = serde_json::from_str(&json).expect("flashvars 应为合法 JSON");
+        assert_eq!(v["video_duration"].as_u64(), Some(361));
+        assert_eq!(v["mediaDefinitions"][0]["quality"].as_u64(), Some(720));
     }
 
     #[test]
