@@ -359,30 +359,137 @@ fn parse_quality_num(text: &str) -> u64 {
     0
 }
 
+fn quality_rank(label: &str) -> u64 {
+    let q = parse_quality_num(label);
+    if q > 0 {
+        return q;
+    }
+    if label.contains("原画") {
+        return 3000;
+    }
+    if label.contains("超清") {
+        return 1080;
+    }
+    if label.contains("高清") {
+        return 720;
+    }
+    if label.contains("标清") {
+        return 480;
+    }
+    if label.contains("流畅") {
+        return 360;
+    }
+    0
+}
+
+fn quality_prefix(q: u64) -> &'static str {
+    match q {
+        2160.. => "原画",
+        1080..=2159 => "超清",
+        720..=1079 => "高清",
+        480..=719 => "标清",
+        1..=479 => "流畅",
+        _ => "",
+    }
+}
+
+fn normalize_weibo_label(label: &str) -> String {
+    let cleaned = clean_html(label);
+    if cleaned.is_empty() {
+        return String::new();
+    }
+    if cleaned.contains("原画")
+        || cleaned.contains("超清")
+        || cleaned.contains("高清")
+        || cleaned.contains("标清")
+        || cleaned.contains("流畅")
+    {
+        return cleaned;
+    }
+    let q = quality_rank(&cleaned);
+    if q > 0 {
+        let prefix = quality_prefix(q);
+        if prefix.is_empty() {
+            return format!("{q}P");
+        }
+        return format!("{prefix} {q}P");
+    }
+    String::new()
+}
+
 fn label_from_hint(hint: &str, url: &str) -> String {
+    let normalized_hint = normalize_weibo_label(hint);
+    if !normalized_hint.is_empty() {
+        return normalized_hint;
+    }
     let q = parse_quality_num(hint).max(parse_quality_num(url));
     if q > 0 {
-        return format!("{q}P");
+        let prefix = quality_prefix(q);
+        if prefix.is_empty() {
+            return format!("{q}P");
+        }
+        return format!("{prefix} {q}P");
     }
     let lower = format!("{} {}", hint.to_ascii_lowercase(), url.to_ascii_lowercase());
     if lower.contains("hd") {
-        return "HD".into();
+        return "高清 720P".into();
     }
     if lower.contains("sd") {
-        return "SD".into();
+        return "标清 480P".into();
     }
     if lower.contains("ld") {
-        return "LD".into();
+        return "流畅 360P".into();
     }
     "默认".into()
 }
 
 fn sort_quality_options(options: &mut [QualityOption]) {
     options.sort_by(|a, b| {
-        parse_quality_num(&b.label)
-            .cmp(&parse_quality_num(&a.label))
+        quality_rank(&b.label)
+            .cmp(&quality_rank(&a.label))
             .then_with(|| b.label.cmp(&a.label))
     });
+}
+
+fn option_from_play_info(play_info: &Value) -> Option<QualityOption> {
+    let url = play_info["url"]
+        .as_str()
+        .or_else(|| play_info["mp4_url"].as_str())
+        .or_else(|| play_info["play_url"].as_str())?;
+    if !looks_video_url(url) {
+        return None;
+    }
+    let label = play_info["quality_desc"]
+        .as_str()
+        .or_else(|| play_info["label"].as_str())
+        .or_else(|| play_info["quality_label"].as_str())
+        .unwrap_or("");
+    Some(QualityOption {
+        label: label_from_hint(label, url),
+        play_url: url.to_string(),
+    })
+}
+
+fn quality_options_from_playback_list(value: &Value) -> Vec<QualityOption> {
+    let mut out = Vec::new();
+    let mut seen_url = HashSet::new();
+    let list = value["playback_list"].as_array().or_else(|| value.as_array());
+    if let Some(list) = list {
+        for item in list {
+            let play_info = if item["play_info"].is_object() {
+                &item["play_info"]
+            } else {
+                item
+            };
+            if let Some(option) = option_from_play_info(play_info) {
+                if seen_url.insert(option.play_url.clone()) {
+                    out.push(option);
+                }
+            }
+        }
+    }
+    sort_quality_options(&mut out);
+    out
 }
 
 fn collect_media_urls(value: &Value, path: &mut Vec<String>, out: &mut Vec<(String, String)>) {
@@ -409,6 +516,10 @@ fn collect_media_urls(value: &Value, path: &mut Vec<String>, out: &mut Vec<(Stri
 }
 
 fn quality_options_from_value(value: &Value) -> Vec<QualityOption> {
+    let from_playback = quality_options_from_playback_list(value);
+    if !from_playback.is_empty() {
+        return from_playback;
+    }
     let mut collected = Vec::new();
     collect_media_urls(value, &mut Vec::new(), &mut collected);
     dedupe_quality_options(collected)
@@ -597,7 +708,11 @@ async fn fetch_tv_playinfo(
         quality_options: Vec::new(),
     };
 
-    if let Some(urls) = info["urls"].as_object() {
+    let playback_options = quality_options_from_playback_list(&info["playback_list"]);
+    if !playback_options.is_empty() {
+        meta.quality_options = playback_options;
+        meta.play_url = best_play_url(&meta.quality_options);
+    } else if let Some(urls) = info["urls"].as_object() {
         let mut items = Vec::new();
         for (k, v) in urls {
             if let Some(url) = v.as_str() {
@@ -709,7 +824,23 @@ mod tests {
         let html = r#"<div video-sources=\"480=https%3A%2F%2Ff.video.weibocdn.com%2Fa.mp4%3Flabel%3Dmp4_480p&720=https%3A%2F%2Ff.video.weibocdn.com%2Fb.mp4%3Flabel%3Dmp4_720p\"></div>"#;
         let opts = extract_video_sources(html);
         let labels: Vec<&str> = opts.iter().map(|o| o.label.as_str()).collect();
-        assert_eq!(labels, vec!["720P", "480P"]);
+        assert_eq!(labels, vec!["高清 720P", "标清 480P"]);
+    }
+
+    #[test]
+    fn prefers_playback_list_native_labels() {
+        let v: Value = serde_json::from_str(
+            r#"{
+                "playback_list":[
+                    {"play_info":{"quality_desc":"超清 1080P","url":"https://f.video.weibocdn.com/top.mp4"}},
+                    {"play_info":{"label":"高清 720P","url":"https://f.video.weibocdn.com/high.mp4"}}
+                ]
+            }"#,
+        )
+        .unwrap();
+        let opts = quality_options_from_value(&v);
+        let labels: Vec<&str> = opts.iter().map(|o| o.label.as_str()).collect();
+        assert_eq!(labels, vec!["超清 1080P", "高清 720P"]);
     }
 
     #[test]
@@ -726,6 +857,20 @@ mod tests {
         .unwrap();
         let opts = quality_options_from_value(&v);
         let labels: Vec<&str> = opts.iter().map(|o| o.label.as_str()).collect();
-        assert_eq!(labels, vec!["1080P", "720P", "480P"]);
+        assert_eq!(labels, vec!["超清 1080P"]);
+    }
+
+    #[test]
+    fn does_not_expose_internal_field_names_as_labels() {
+        let v: Value = serde_json::from_str(
+            r#"{
+                "stream_url":"https://f.video.weibocdn.com/low.mp4?label=mp4_480p",
+                "stream_url_hd":"https://f.video.weibocdn.com/high.mp4?label=mp4_720p"
+            }"#,
+        )
+        .unwrap();
+        let opts = quality_options_from_value(&v);
+        let labels: Vec<&str> = opts.iter().map(|o| o.label.as_str()).collect();
+        assert_eq!(labels, vec!["高清 720P", "标清 480P"]);
     }
 }
