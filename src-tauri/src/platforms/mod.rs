@@ -9,6 +9,7 @@ pub mod douyin;
 pub mod haokan;
 pub mod kuaishou;
 pub mod pornhub;
+pub mod weibo;
 
 use serde::Serialize;
 
@@ -85,6 +86,9 @@ pub async fn parse(text: &str, proxy: &ProxyCfg) -> Result<VideoInfo, String> {
     if pornhub::can_handle(text) {
         return pornhub::parse(&client, text).await;
     }
+    if weibo::can_handle(text) {
+        return weibo::parse(&client, text).await;
+    }
 
-    Err("未识别的链接，目前仅支持抖音、快手、哔哩哔哩、好看视频 分享链接".into())
+    Err("未识别的链接，目前仅支持抖音、快手、哔哩哔哩、好看视频、微博 分享链接".into())
 }

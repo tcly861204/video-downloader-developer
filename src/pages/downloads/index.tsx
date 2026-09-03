@@ -130,6 +130,7 @@ const Downloads = () => {
                 <span className='s-tag'>快手</span>
                 <span className='s-tag'>哔哩哔哩</span>
                 <span className='s-tag'>好看视频</span>
+                <span className='s-tag'>微博</span>
               </>
             ) : (
               <>
@@ -145,7 +146,7 @@ const Downloads = () => {
           onChange={(e) => setLink(e.target.value)}
           placeholder={
             mode === 'single'
-              ? '粘贴分享文本或链接，例如：\n抖音：7.94 复制打开抖音… https://v.douyin.com/xxxx/\n快手：复制打开快手… https://v.kuaishou.com/xxxx/'
+              ? '粘贴分享文本或链接，例如：\n抖音：7.94 复制打开抖音… https://v.douyin.com/xxxx/\n快手：复制打开快手… https://v.kuaishou.com/xxxx/\n'
               : '粘贴用户主页链接，例如：\nhttps://www.douyin.com/user/MS4wLjABAAAA…'
           }
           rows={3}

@@ -128,6 +128,8 @@ fn referer_for(url: &str) -> &'static str {
         "https://www.kuaishou.com/"
     } else if url.contains("haokan") || url.contains("bdstatic") {
         "https://haokan.baidu.com/"
+    } else if url.contains("weibo") || url.contains("weibocdn") || url.contains("sinaimg") {
+        "https://weibo.com/"
     } else if url.contains("pornhub") || url.contains("phncdn") {
         "https://www.pornhub.com/"
     } else {

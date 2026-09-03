@@ -76,7 +76,7 @@ const About = () => {
         <span className={styles.aboutName}>FRAMECATCH</span>
         <span className={styles.aboutEn}>MULTI-PLATFORM VIDEO DOWNLOADER</span>
         <p className={styles.aboutDesc}>
-          把全网的视频收进你的设备。支持 Bilibili、YouTube、抖音、快手、好看视频 等多个平台，
+          把全网的视频收进你的设备。支持 Bilibili、微博、抖音、快手、好看视频 等多个平台，
           粘贴链接即可解析、离线珍藏你喜欢的每一帧画面。
         </p>
       </div>

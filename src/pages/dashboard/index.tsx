@@ -12,6 +12,7 @@ const PLATFORMS = [
   '抖音',
   '快手',
   '好看视频',
+  '微博',
   'TikTok',
   'Vimeo',
   'X · Twitter',
@@ -73,7 +74,7 @@ const Dashboard = () => {
           </p>
 
           <p className={`${styles.sub} ${styles.reveal}`} style={reveal('720ms')}>
-            粘贴 Bilibili、抖音、快手、好看视频、... 等平台的视频链接，
+            粘贴 Bilibili、抖音、快手、好看视频、微博 等平台的视频链接，
             <br className={styles.br} />
             一键解析，离线保存到本地设备。
           </p>

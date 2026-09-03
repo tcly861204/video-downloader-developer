@@ -22,6 +22,7 @@ const PLATFORM_COLORS: Record<string, string> = {
   '抖音': '#25f4ee',
   '快手': '#ff6b3d',
   '好看视频': '#2e7cf6',
+  '微博': '#ff6a5c',
   'Pornhub': '#ff9000',
   'TikTok': '#69c9ff',
   'Vimeo': '#1ab7ea',
